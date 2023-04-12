@@ -51,7 +51,7 @@ OPENAI_API_KEY=sk-abcdefghijklmnop123456
 ```
 
 Next step is to add EdgeGPT functionality to gpt-plus. Steps are as follows:
-- Install the cookie editor extension for Chrome or Firefox
+- Install the cookie editor extension for [Edge](https://chrome.google.com/webstore/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm)
 - Go to bing.com (Login to page)
 - Open the extension
 - Click "Export" on the bottom right, then "Export as JSON" (This saves your cookies to clipboard)
