@@ -16,9 +16,10 @@ Use the following options in gpt-plus for additional options:
 ```sh
 Use 'search web' for searching the internet.
 Use 'search wiki' for searching Wikipedia.
-Use 'ask bing' for bing chat.
 Use 'tasks' to enter multi task mode.
-Use 'read clipboard' to access text from clipboard
+Use 'read clipboard' to access text from clipboard.
+Use 'ask gpt to request response specifically from ChatGPT.
+Use 'ask bing' to request response specifically from bing.
 Use '!reset' to reset program.
 ```
 Additionally, gpt-plus will auto switch to bing mode if words such as 'weather' and 'news' are utilised in the prompt as ChatGPT doesn't have access to current information.
@@ -37,6 +38,26 @@ Use the following to start gpt-plus
 ```sh
 python3 gpt-plus.sh
 ```
+
+## Configuration
+Visit https://platform.openai.com/account/api-keys to generate a API Key
+Add API key to .env file (hidden) located in the gpt-plus folder
+
+Example
+
+```sh
+# .env
+OPENAI_API_KEY=sk-abcdefghijklmnop123456
+```
+
+Next step is to add EdgeGPT functionality to gpt-plus. Steps are as follows:
+- Install the cookie editor extension for Chrome or Firefox
+- Go to bing.com (Login to page)
+- Open the extension
+- Click "Export" on the bottom right, then "Export as JSON" (This saves your cookies to clipboard)
+- Paste your cookies into a file cookies.json located in gpt-plus
+
+Read additional details on https://github.com/acheong08/EdgeGPT
 
 ## Credits
 - EdgeGPT (Bing) - https://github.com/acheong08/EdgeGPT
