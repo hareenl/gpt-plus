@@ -1,6 +1,7 @@
 # gpt-plus
 ## _Combination of ChatGPT and Bing with multi-tasking_
 
+![](https://github.com/hareenl/gpt-plus/preview.gif)
 
 ## Features
 
@@ -24,11 +25,12 @@ Use '!reset' to reset program.
 ```
 Additionally, gpt-plus will auto switch to bing mode if words such as 'weather' and 'news' are utilised in the prompt as ChatGPT doesn't have access to current information.
 
+
 ## Installation
 Install the dependencies for gpt-plus.
 
 ```sh
-git pull https://github.com/hareenl/gpt-plus
+git pull https://github.com/hareenl/gpt-plus.git
 cd gpt-plus
 pip3 install -r requirements.txt
 ```
