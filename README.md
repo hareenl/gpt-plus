@@ -19,7 +19,7 @@ Use 'search web' for searching the internet.
 Use 'search wiki' for searching Wikipedia.
 Use 'tasks' to enter multi task mode.
 Use 'read clipboard' to access text from clipboard.
-Use 'ask gpt to request response specifically from ChatGPT.
+Use 'ask gpt' to request response specifically from ChatGPT.
 Use 'ask bing' to request response specifically from bing.
 Use '!reset' to reset program.
 ```
@@ -30,7 +30,7 @@ Additionally, gpt-plus will auto switch to bing mode if words such as 'weather' 
 Install the dependencies for gpt-plus.
 
 ```sh
-git pull https://github.com/hareenl/gpt-plus.git
+git clone https://github.com/hareenl/gpt-plus.git
 cd gpt-plus
 pip3 install -r requirements.txt
 ```

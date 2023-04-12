@@ -86,6 +86,7 @@ def get_user_role():
 			file.write(roles[choice])
 	return roles[choice]
 
+
 def tasks():
 	# Ask the user to input a quantity of tasks
 	while True:
@@ -112,26 +113,31 @@ def tasks():
 
 async def bing(prompt):
 	try:
-		bing = Chatbot(cookiePath='cookies.json')
-		response = await bing.ask(prompt=prompt, conversation_style=ConversationStyle.precise)
+		bot = Chatbot(cookiePath='cookies.json')
+		response = await bot.ask(prompt=prompt, conversation_style=ConversationStyle.precise)
 		
 		if "item" not in response or "messages" not in response["item"]:
 			print("Error: Invalid response format")
 			return ""
 		
-		bot_messages = [message for message in response["item"]["messages"] if message["author"] == "bot"]
+		bing_messages = [message for message in response["item"]["messages"] if message["author"] == "bot"]
 		
-		if not bot_messages:
+		if not bing_messages:
 			print("Error: No bot messages found in response")
 			return ""
 		
-		bing_response = bot_messages[-1]["text"]
+		bing_response = bing_messages[-1]["text"]
 		bing_response = re.sub('\[\^\d+\^\]', '', bing_response)
 		print("\nBing:\n" + bing_response)
-		return bing_response
+		with open('activity.txt', 'w') as f:
+			# Add the text to the file
+			f.write(bing_response+'\n')
+		await bot.close()
+		
 	except Exception as e:
 		print("Error:", str(e))
 		return ""
+	
 
 
 def wiki(text):
@@ -159,6 +165,7 @@ def wiki(text):
 		# Handle other exceptions
 		print(f"Error: {e}")
 	return	
+	
 	
 def google(query):
 	try:
@@ -304,10 +311,7 @@ def process_input(user_input, model, role):
 	
 	if user_input.find('weather') != -1 or user_input.find('news') != -1 or user_input.find('price') != -1 or user_input.find('stock') != -1 or user_input.find('latest') != -1 or user_input.find('current') != -1:
 		bing_input = user_input + ". Do not ask any questions after responding."
-		user_input = asyncio.run(bing(bing_input))
-		with open('activity.txt', 'w') as f:
-			# Add the text to the file
-			f.write(user_input+'\n')
+		asyncio.run(bing(bing_input))
 		return 
 	
 	if user_input.find('ask bing') != -1:
