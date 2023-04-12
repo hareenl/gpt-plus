@@ -1,7 +1,7 @@
 # gpt-plus
 ## _Combination of ChatGPT and Bing with multi-tasking_
 
-![](https://github.com/hareenl/gpt-plus/preview.gif)
+![](https://raw.githubusercontent.com/hareenl/gpt-plus/main/preview.gif)
 
 ## Features
 
