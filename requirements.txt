@@ -1,0 +1,8 @@
+openai
+google
+googlesearch-python
+python-dotenv
+wikipedia
+pyperclip
+EdgeGPT
+rollbar
