@@ -38,7 +38,7 @@ pip3 install -r requirements.txt
 Use the following to start gpt-plus
 
 ```sh
-python3 gpt-plus.sh
+python3 gpt-plus.py
 ```
 
 ## Configuration
