@@ -1,15 +1,15 @@
 # gpt-plus
 ## _Combination of ChatGPT and Bing with multi-tasking_
 
-![](https://raw.githubusercontent.com/hareenl/gpt-plus/main/preview.gif)
+![](https://raw.githubusercontent.com/hareenl/gpt-plus/main/images/preview.gif)
 
 ## Features
 
-- Automatic switching between chatgpt and bing depending on request
-- Multitask mode to execute as many tasks as required with access to information aquired from a prior task.
-- Wikipeadia searching 
-- Google Searching
+- Automatic switching between ChatGPT and Bing depending on request
+- Multitask mode to execute as many tasks as required with access to information acquired from a prior task.
 - Ability to switch between gpt-3.5-turbo and gpt-4
+- Searching articles on Wikipeadia
+- Searching articles on Google
 - Options for switching between multiple chatgpt roles
 
 ## Options
@@ -20,14 +20,14 @@ Use 'search wiki' for searching Wikipedia.
 Use 'tasks' to enter multi task mode.
 Use 'read clipboard' to access text from clipboard.
 Use 'ask gpt' to request response specifically from ChatGPT.
-Use 'ask bing' to request response specifically from bing.
+Use 'ask bing' to request response specifically from Bing.
 Use '!reset' to reset program.
 ```
 Additionally, gpt-plus will auto switch to bing mode if words such as 'weather' and 'news' are utilised in the prompt as ChatGPT doesn't have access to current information.
 
 
 ## Installation
-Install the dependencies for gpt-plus.
+Download gpt-plus and install dependencies.
 
 ```sh
 git clone https://github.com/hareenl/gpt-plus.git
@@ -53,14 +53,17 @@ OPENAI_API_KEY=sk-abcdefghijklmnop123456
 ```
 
 Next step is to add EdgeGPT functionality to gpt-plus. Steps are as follows:
-- Install the cookie editor extension for [Edge](https://chrome.google.com/webstore/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm)
+- Install the cookie editor extension for [Chrome/Edge](https://chrome.google.com/webstore/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm) or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/cookie-editor/)
 - Go to bing.com (Login to page)
 - Open the extension
 - Click "Export" on the bottom right, then "Export as JSON" (This saves your cookies to clipboard)
 - Paste your cookies into a file cookies.json located in gpt-plus
 
-Read additional details on https://github.com/acheong08/EdgeGPT
+Read additional details on [EdgeGPT](https://github.com/acheong08/EdgeGPT)
+
+## Prompt Example
+![](https://raw.githubusercontent.com/hareenl/gpt-plus/main/images/preview.png)
 
 ## Credits
-- EdgeGPT (Bing) - https://github.com/acheong08/EdgeGPT
-- Prompthero (ChatGPT Prompts) - https://prompthero.com/chatgpt-prompts
+- [EdgeGPT (Bing)](https://github.com/acheong08/EdgeGPT)
+- [Prompthero (ChatGPT Prompts)](https://prompthero.com/chatgpt-prompts)

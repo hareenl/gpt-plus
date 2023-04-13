@@ -38,7 +38,7 @@ def get_gpt_ver():
 		2: "gpt-4 (slow - Requires API access)"
 	}
 	
-	with open("gptver.txt", "w") as file:
+	with open("data/gptver.txt", "w") as file:
 			# Write some text to the file
 			file.write(ver[choice])
 	return ver[choice]
@@ -81,10 +81,27 @@ def get_user_role():
 		10: "I want you to act as a text based adventure game. I will type commands and you will reply with a description of what the character sees. I want you to only reply with the game output and nothing else. do not write explanations. do not type commands unless I instruct you to do so. First command is wake up"
 	}
 	
-	with open("role.txt", "w") as file:
+	with open("data/role.txt", "w") as file:
 			# Write some text to the file
 			file.write(roles[choice])
 	return roles[choice]
+
+def reset():
+	with open('data/activity.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")
+	with open('data/gptver.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")
+	with open('data/role.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")
+	with open('data/web.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")
+	with open('data/wiki.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")
 
 
 def tasks():
@@ -129,7 +146,7 @@ async def bing(prompt):
 		bing_response = bing_messages[-1]["text"]
 		bing_response = re.sub('\[\^\d+\^\]', '', bing_response)
 		print("\nBing:\n" + bing_response)
-		with open('activity.txt', 'w') as f:
+		with open('data/activity.txt', 'w') as f:
 			# Add the text to the file
 			f.write(bing_response+'\n')
 		await bot.close()
@@ -153,7 +170,7 @@ def wiki(text):
 		#print("Wikipedia Output:\n" + summary)
 		
 		# Write the summary to a file
-		with open('wiki.txt', 'w') as f:
+		with open('data/wiki.txt', 'w') as f:
 			f.write(summary)
 	except wikipedia.exceptions.DisambiguationError as e:
 		# Handle disambiguation error
@@ -169,7 +186,7 @@ def wiki(text):
 	
 def google(query):
 	try:
-		results = list(search(query, tld="co.in", num=10, stop=10, pause=2))
+		results = list(search(query, tld="com", num=10, stop=10, pause=2))
 		
 		if not results:
 			print("No results found.")
@@ -199,30 +216,25 @@ def google(query):
 		return ""
 
 def previous_sesh():
-	while True:
-		response = input("\nHi, this is an improved version of ChatGPT with support for multiple roles, web scraping, google searching and executing multiple tasks. Complete the setup and use the following options: \nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse 'tasks' to enter multi task mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'ask gpt to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from bing.\nUse '!reset' to reset program.\n\nWould you like to continue the previous session?:" + " (y/n) ").lower()
-		if response in ["y", "yes"]:
-			return True
-		elif response in ["n", "no"]:
-			with open('activity.txt', 'w') as f:
-				# Add the text to the file
-				f.write("")
-			with open('web.txt', 'w') as f:
-				# Add the text to the file
-				f.write("")
-			with open('role.txt', 'w') as f:
-				# Add the text to the file
-				f.write("")
-			with open('wiki.txt', 'w') as f:
-				# Add the text to the file
-				f.write("")
-			with open('gptver.txt', 'w') as f:
-				# Add the text to the file
-				f.write("")
-			return False
-		else:
-			print("Invalid response. Please enter 'y' or 'n'.")
-			
+	print("\nHi, this is an improved version of ChatGPT with support for multiple roles, web scraping, google searching and executing multiple tasks. Complete the setup and use the following options: \nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse 'tasks' to enter multi task mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'ask gpt to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from Bing.\nUse '!reset' to clear history and reset program.\n")
+	with open('data/gptver.txt', 'r') as file:
+		gptver = file.read()# Use the previous role
+		#print("Role: " + activity + "\n")	
+	with open('data/role.txt', 'r') as file:
+		role = file.read()# Use the previous role
+		#print("Role: " + activity + "\n")	
+	if gptver != "" and role !="":
+		while True:
+			response = input("Would you like to continue the previous session?:" + " (y/n) ").lower()
+			if response in ["y", "yes"]:
+				return True
+			elif response in ["n", "no"]:
+				reset()
+				return False
+			else:
+				print("Invalid response. Please enter 'y' or 'n'.")
+	else:
+		return False
 
 def contains_url(text):
 	url_pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
@@ -241,7 +253,7 @@ def scrape_web(url):
 			# Get the title
 			title = soup.find('title').text
 			#print(f"Title: {title}")
-			with open('web.txt', 'a') as f:
+			with open('data/web.txt', 'a') as f:
 				# Add the text to the file
 				f.write(title + '\n')
 				
@@ -251,7 +263,7 @@ def scrape_web(url):
 				paragraphs = article_body.find_all('p')
 				for paragraph in paragraphs:
 					#print(paragraph.text)
-					with open('web.txt', 'a') as f:
+					with open('data/web.txt', 'a') as f:
 						# Add the text to the file
 						f.write(paragraph.text)
 			else:
@@ -264,6 +276,12 @@ def scrape_web(url):
 		
 def gpt(prompt, model, role):
 	try:
+		with open('data/activity.txt', 'r') as file:
+			activity = file.read()# Use the previous role
+			#print("Role: " + activity + "\n")
+		
+		prompt = activity + "\n" + prompt
+		
 		response = openai.ChatCompletion.create(
 			max_tokens=1000,
 			model=model,
@@ -285,7 +303,9 @@ def gpt(prompt, model, role):
 		if not result:
 			print("Error: No content in response from OpenAI")
 			return ""
-		
+		with open('data/activity.txt', 'w') as f:
+			# Add the text to the file
+			f.write(result+'\n')
 		return result
 	
 	except Exception as e:
@@ -299,7 +319,7 @@ def process_input(user_input, model, role):
 		url = url_pattern.findall(user_input)
 		#print (url[0])
 		scrape_web(url[0])
-		with open('web.txt', 'r') as file:
+		with open('data/web.txt', 'r') as file:
 			webtxt = file.read()# Use the previous role
 			#print("Role: " + activity + "\n")	
 		nourl = remove_url(user_input)
@@ -308,6 +328,13 @@ def process_input(user_input, model, role):
 			user_input = webtxt
 		else:
 			user_input = nourl + " " + webtxt
+			
+	if user_input.find('ask gpt') != -1:
+		string_without_askgpt = user_input.replace("ask gpt", "")
+		gptout = gpt(string_without_askgpt,model,role)
+		print('\nChatGPT:\n' + gptout)
+		print('\n\n')
+		return
 	
 	if user_input.find('weather') != -1 or user_input.find('news') != -1 or user_input.find('price') != -1 or user_input.find('stock') != -1 or user_input.find('latest') != -1 or user_input.find('current') != -1:
 		bing_input = user_input + ". Do not ask any questions after responding."
@@ -317,20 +344,15 @@ def process_input(user_input, model, role):
 	if user_input.find('ask bing') != -1:
 		string_without_askbing = user_input.replace("ask bing", "") + ". Do not ask any questions after responding."
 		user_input = asyncio.run(bing(string_without_askbing))
-		with open('activity.txt', 'w') as f:
+		with open('data/activity.txt', 'w') as f:
 			# Add the text to the file
 			f.write(user_input+'\n')
 		return 
 	
-	if user_input.find('ask gpt') != -1:
-		string_without_askbing = user_input.replace("ask gpt", "")
-		user_input = asyncio.run(bing(string_without_askbing))
-	
-	
 	if user_input.find('search wiki') != -1:
 		string_without_wiki = user_input.replace("search wiki", "")
 		wiki(str(string_without_wiki))
-		with open('wiki.txt', 'r') as file:
+		with open('data/wiki.txt', 'r') as file:
 			wikiout = file.read()# Use the previous role
 			#print("Role: " + activity + "\n")
 		user_input = "summarise" + wikiout
@@ -340,7 +362,7 @@ def process_input(user_input, model, role):
 		#print(string_without_search)
 		url = google(string_without_search)
 		scrape_web(url)
-		with open('web.txt', 'r') as file:
+		with open('data/web.txt', 'r') as file:
 			webtxt = file.read()# Use the previous role
 			#print("Role: " + activity + "\n")	
 		user_input = "summarise" + webtxt
@@ -353,22 +375,12 @@ def process_input(user_input, model, role):
 	if user_input == "shutdown":
 		exit(0)
 	if user_input == "!reset":
-		with open('activity.txt', 'w') as f:
-			# Add the text to the file
-			f.write("")
-		print('\n')
+		print('Clearing history...')
+		reset()
+		print('Resetting..\n')
 		main()
 		
-		
-	with open('activity.txt', 'r') as file:
-		activity = file.read()# Use the previous role
-		#print("Role: " + activity + "\n")	
-		
-	user_input = activity + "\n" + user_input
 	gptout = gpt(user_input,model,role)
-	with open('activity.txt', 'w') as f:
-		# Add the text to the file
-		f.write(gptout+'\n')
 	print('\nChatGPT:\n' + gptout)
 	print('\n\n')
 
@@ -376,21 +388,13 @@ def process_input(user_input, model, role):
 def main():
 	
 	if previous_sesh():
-		with open('gptver.txt', 'r') as file:
+		with open('data/gptver.txt', 'r') as file:
 			model = file.read()# Use the previous role
 			#print("Role: " + activity + "\n")	
-		with open('role.txt', 'r') as file:
+		with open('data/role.txt', 'r') as file:
 			role = file.read()# Use the previous role
 			#print("Role: " + activity + "\n")	
-			
-	else:
-		with open('activity.txt', 'w') as f:
-			# Add the text to the file
-			f.write("")
-		with open('web.txt', 'w') as f:
-			# Add the text to the file
-			f.write("")
-			
+	else:		
 		model = get_gpt_ver()
 		role = get_user_role()	
 	
