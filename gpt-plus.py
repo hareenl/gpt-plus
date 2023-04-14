@@ -382,7 +382,7 @@ def save_py():
 		code = ''.join(re.findall(pattern, text))
 		
 		# Write the code to a new file
-		with open('generated_code.py', 'w') as file:
+		with open('output/generated_code.py', 'w') as file:
 			file.write(code)
 			
 	except FileNotFoundError:
