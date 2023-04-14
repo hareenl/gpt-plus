@@ -9,6 +9,7 @@
 - Multitask mode to execute as many tasks as required with access to information acquired from a prior task.
 - Ability to switch between gpt-3.5-turbo and gpt-4
 - Text to speech support with AWS Polly (Neural Engine)
+- Multi-step Python code generation utilising 'Role 2: Python Programmer'. The Generated code will be saved as 'generated_code.py'
 - Searching articles on Wikipeadia
 - Searching articles on Google
 - Options for switching between multiple chatgpt roles
@@ -74,8 +75,80 @@ AWS_SECRET_ACCESS_KEY=abcdefghijklmnop1234
 python3 gpt-plus.py
 ```
 
-## Prompt Example
-![](https://raw.githubusercontent.com/hareenl/gpt-plus/main/images/preview.png)
+## Prompt Examples
+### Multi step python code generation (Utilising Role 2: Python Programmer)
+![](https://raw.githubusercontent.com/hareenl/gpt-plus/main/images/preview1.png)
+##### Code Output
+The generated code is exported as 'generated_code.py' in gpt-plus folder. Code below is based on above prompt input in Multitask mode.
+```sh
+# Import the necessary libraries
+import openai
+import requests
+import json
+
+# Set up the API endpoint and token
+openai.api_key = "<YOUR_API_KEY>"
+endpoint = "https://api.openai.com/v1/images/generations"
+
+# Take user input for the prompt generation
+prompt_str = input("Enter a prompt to generate an image: ")
+
+# Ask the user for image size selection
+size_options = ["256x256", "512x512", "1024x1024"]
+print("Choose an image size:")
+for i, size_option in enumerate(size_options):
+print(f"{i+1}. {size_option}")
+
+# Use a try-except block to handle errors if the user enters an invalid option
+while True:
+try:
+size_index = int(input()) - 1
+size = size_options[size_index]
+break
+except:
+print("Invalid option. Please try again.")
+
+# Set up the prompt generation parameters
+model_engine = "davinci"
+prompt = openai.Completion.create(
+engine=model_engine,
+prompt=prompt_str,
+max_tokens=50,
+n=1,
+stop=None,
+temperature=0.5
+)
+
+# Set the image parameters
+model = "image-alpha-001"
+prompt_text = prompt["choices"][0]["text"].strip()
+response_format = "url"    # This will return a JSON object containing the URL of the generated image
+
+# Set up the API request headers and body
+headers = {
+"Content-Type": "application/json",
+"Authorization": f"Bearer {openai.api_key}"
+}
+
+data = {
+"model": model,
+"prompt": prompt_text,
+"size": size,
+"response_format": response_format
+}
+
+# Send the API request and print the result
+try:
+response = requests.post(endpoint, headers=headers, data=json.dumps(data))
+response_dict = json.loads(response.text)
+print(response_dict["data"][0]["url"])
+except:
+print("API request failed. Please try again.")
+
+```
+
+### Itinerary generation based on weather
+![](https://raw.githubusercontent.com/hareenl/gpt-plus/main/images/preview2.png)
 
 ## Credits
 - [EdgeGPT (Bing)](https://github.com/acheong08/EdgeGPT)

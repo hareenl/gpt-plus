@@ -110,7 +110,7 @@ def get_user_role():
 	#Following ideas were for roles are from chatGPT propmpts on prompthero		
 	roles = {
 		1: "You are a helpful AI ready to assist with multiple tasks",
-		2: "You are a programming assistant which outputs python code for given scenarios",
+		2: "I want you to act as a python programming assistant. Outputs python code for given requests and only output python code. Add comments inside code. Do not provide descriptions outside code. Always place code inside ```python",
 		3: "As a guide/prompter for a text-to-image AI, your task is to create a detailed prompt for the provided theme. The 'Prompt: ' should be concise, consisting of 5-10 short sentences that provide an initial description of the image, followed by the 'Keywords: ' , which are 5-10 descriptive adjectives or keywords to add depth and flavour. The 'Negative Words:' are the descriptive adjectives or keywords that you don't want included in the image. For example, if the prompt is 'A mighty dragon with gleaming scales taking flight over towering mountains in a dramatic display of power and grace.', you could add 'A mighty dragon', 'gleaming scales', towering mountains, 'dramatic as a Keywords and 'weak' or 'uninspiring' as a Negative Word, Please follow this exact pattern and do not make up your own",
 		4: "I want you to act as my legal advisor. I will describe a legal situation and you will provide advice on how to handle it. You should only reply with your advice, and nothing else. Do not write explanations",
 		5: "I want you to act as a screenwriter. You will develop an engaging and creative script for either a feature length film, or a Web Series that can captivate its viewers. Start with coming up with interesting characters, the setting of the story, dialogues between the characters etc. Once your character development is complete - create an exciting storyline filled with twists and turns that keeps the viewers in suspense until the end",
@@ -160,9 +160,9 @@ def tasks():
 	# Ask the user to input a quantity of tasks
 	while True:
 		try:
-			print("\nEntering Multi Task Mode.")
+			print("\nEntering Multitask Mode.")
 			voice = "Matthew"
-			asyncio.run(synthesize_text("Entering Multi Task Mode.",voice))
+			asyncio.run(synthesize_text("Entering Multitask Mode.",voice))
 			voice = "Matthew"
 			asyncio.run(synthesize_text("How many tasks do you want to enter?",voice))
 			num_tasks = int(input("\nHow many tasks do you want to enter? "))
@@ -306,7 +306,7 @@ def google(query):
 
 
 def previous_sesh():
-	print("\nHi, chatgpt-plus supports auto switching between ChatGPT and Bing with support for multiple roles, web scraping, google searching and executing multiple tasks. Complete setup and use the following options as required: \n\nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse 'tasks' to enter multi task mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'ask gpt to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from Bing.\nUse '!clear' to clear current history and move to a new topic.\nUse '!reset' to clear history and reset program.\n")
+	print("\nHi, chatgpt-plus supports auto switching between ChatGPT and Bing with support for multiple roles, web scraping, google searching and executing multiple tasks. Complete setup and use the following options as required: \n\nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse 'tasks' to enter multitask mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'ask gpt to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from Bing.\nUse '!clear' to clear current history and move to a new topic.\nUse '!reset' to clear history and reset program.\n")
 	with open('data/gptver.txt', 'r') as file:
 		gptver = file.read()# Use the previous role
 		#print("Role: " + activity + "\n")	
@@ -368,6 +368,29 @@ def scrape_web(url):
 	except requests.exceptions.ConnectionError as e:
 		print("Error: ", e)				
 
+
+def save_py():
+	# Define the regular expression pattern to match the code snippet
+	pattern = re.compile(r"```python\n([\s\S]*?)\n```")
+	
+	try:
+		# Read the text file
+		with open('data/activity.txt', 'r') as file:
+			text = file.read()
+			
+		# Find all code snippets in the text and join them into one string
+		code = ''.join(re.findall(pattern, text))
+		
+		# Write the code to a new file
+		with open('generated_code.py', 'w') as file:
+			file.write(code)
+			
+	except FileNotFoundError:
+		print("Error: The input file 'activity.txt' could not be found.")
+		
+	except Exception as e:
+		print(f"An error occurred while processing the file: {e}")
+
 	
 def gpt(prompt, model, role):
 	try:
@@ -378,7 +401,7 @@ def gpt(prompt, model, role):
 		prompt = activity + "\n" + prompt
 		
 		response = openai.ChatCompletion.create(
-			max_tokens=1000,
+			max_tokens=2048,
 			model=model,
 			messages=[
 				{"role": "system", "content": role },
@@ -402,9 +425,11 @@ def gpt(prompt, model, role):
 		with open('data/activity.txt', 'w') as f:
 			# Add the text to the file
 			f.write(result+'\n')
-		voice = "Ruth"
-		asyncio.run(synthesize_text(result,voice))
-		
+		if role == "I want you to act as a python programming assistant. Outputs python code for given requests and only output python code. Add comments inside code. Do not provide descriptions outside code. Always place code inside ```python":
+			save_py()
+		else:	
+			voice = "Ruth"
+			asyncio.run(synthesize_text(result,voice))
 		return
 	
 	except Exception as e:

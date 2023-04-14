@@ -1,0 +1,89 @@
+Here is the updated code with error handling:
+
+```python
+import openai
+import requests
+
+openai.api_key = "YOUR_API_KEY"
+
+# get user prompt using OpenAI's GPT-3
+def get_prompt(prompt):
+    response = openai.Completion.create(
+        engine="text-davinci-002",
+        prompt=prompt,
+        temperature=0.5,
+        max_tokens=1024,
+        n=1,
+        stop=None,
+        timeout=5
+    )
+
+    message = response.choices[0].text
+    return message.strip()
+
+
+# get user prompt from input()
+prompt = input("Enter your prompt: ")
+
+# call get_prompt function
+prompt = get_prompt(prompt)
+
+model = "image-alpha-001"
+response_format = "url"
+n_images = 1
+
+size_options = ["256x256", "512x512", "1024x1024"]
+while True:
+    print("Please select image size:")
+    for i, size in enumerate(size_options):
+        print(f"{i+1}. {size}")
+
+    choice = input("Enter your choice: ")
+    try:
+        choice = int(choice)
+        if choice in range(1, len(size_options) + 1):
+            break
+        else:
+            print("Invalid choice. Please try again.")
+    except ValueError:
+        print("Invalid input. Please try again.")
+
+size = size_options[choice-1]
+
+try:
+    response = openai.Image.create(
+        prompt=prompt,
+        n=n_images,
+        size=size,
+        model=model,
+        response_format=response_format,
+        timeout=5
+    )
+except Exception as e:
+    print(f"Error generating image: {e}")
+    exit()
+
+try:
+    image_url = response["data"][0]["url"]
+except KeyError:
+    print("Error: Could not generate URL for image")
+    exit()
+
+try:
+    response = requests.get(image_url)
+    response.raise_for_status()
+except requests.exceptions.HTTPError as e:
+    print(f"Error downloading image: {e}")
+    exit()
+
+try:
+    with open("van_gogh_penguin.png", 'wb') as f:
+        f.write(response.content)
+except IOError as e:
+    print(f"Error saving image to file: {e}")
+    exit()
+
+print("Van Gogh-style penguin artwork created and saved to disk.")
+``` 
+
+In this updated code, we added error handling to different parts of the program. For example, if there's an error generating the image or downloading the image from the URL, the program will exit and print the error message. If there's an error saving the image to the file, the program will exit and print an error message. This helps make the program more robust against errors and makes it easier to identify and fix problems.
