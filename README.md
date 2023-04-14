@@ -40,22 +40,10 @@ pip3 install -r requirements.txt
 Visit https://platform.openai.com/account/api-keys to generate a API Key
 Add API key to .env file (hidden) located in the gpt-plus folder
 
-Example
-
+#### Example
 ```sh
 # .env
 OPENAI_API_KEY=sk-abcdefghijklmnopqrstuvwxyz123456
-```
-
-Optional Step - Add AWS Polly support for Text-to-Speech by filling in the AWS Access and Secret keys in the .env file.
-If this step is completed, the console provide an option to enable Text-to-Speech when initialised.
-
-Example
-```sh
-# .env
-OPENAI_API_KEY=sk-abcdefghijklmnopqrstuvwxyz123456
-AWS_ACCESS_KEY_ID=ABCDEFGHIJK123456
-AWS_SECRET_ACCESS_KEY=abcdefghijklmnop1234
 ```
 
 Next step is to add EdgeGPT functionality to gpt-plus. Steps are as follows:
@@ -66,6 +54,18 @@ Next step is to add EdgeGPT functionality to gpt-plus. Steps are as follows:
 - Paste your cookies into a file cookies.json located in gpt-plus
 
 Read additional details on [EdgeGPT](https://github.com/acheong08/EdgeGPT)
+
+### Optional Step 
+Add AWS Polly support for Text-to-Speech by filling in the AWS Access and Secret keys in the .env file.
+If this step is completed, the console provide an option to enable Text-to-Speech when initialised.
+
+#### Example
+```sh
+# .env
+OPENAI_API_KEY=sk-abcdefghijklmnopqrstuvwxyz123456
+AWS_ACCESS_KEY_ID=ABCDEFGHIJK123456
+AWS_SECRET_ACCESS_KEY=abcdefghijklmnop1234
+```
 
 ## Start gpt-plus
 
