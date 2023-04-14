@@ -9,7 +9,7 @@
 - Multitask mode to execute as many tasks as required with access to information acquired from a prior task.
 - Ability to switch between gpt-3.5-turbo and gpt-4
 - Text to speech support with AWS Polly (Neural Engine)
-- Multi-step Python code generation utilising 'Role 2: Python Programmer'. The Generated code will be saved as 'generated_code.py'
+- Multi-step Python code generation utilising 'Role 2: Python Programmer'. The Generated code will be saved as 'output/generated_code.py'
 - Searching articles on Wikipeadia
 - Searching articles on Google
 - Options for switching between multiple chatgpt roles
@@ -79,7 +79,7 @@ python3 gpt-plus.py
 ### Multi step python code generation (Utilising Role 2: Python Programmer)
 ![](https://raw.githubusercontent.com/hareenl/gpt-plus/main/images/preview1.png)
 ##### Code Output
-The generated code is exported as 'generated_code.py' in gpt-plus folder. Code below is based on above prompt input in Multitask mode.
+The generated code is exported as 'generated_code.py' in the 'output' folder. Code below is based on above prompt input in Multitask mode.
 ```sh
 # Import the necessary libraries
 import openai
