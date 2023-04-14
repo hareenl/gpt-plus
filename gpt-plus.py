@@ -142,12 +142,29 @@ def reset():
 	with open('data/wiki.txt', 'w') as f:
 		# Add the text to the file
 		f.write("")
+		
+def clear():
+	with open('data/activity.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")
+	with open('data/web.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")
+	with open('data/wiki.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")
+		
 
 
 def tasks():
 	# Ask the user to input a quantity of tasks
 	while True:
 		try:
+			print("\nEntering Multi Task Mode.")
+			voice = "Matthew"
+			asyncio.run(synthesize_text("Entering Multi Task Mode.",voice))
+			voice = "Matthew"
+			asyncio.run(synthesize_text("How many tasks do you want to enter?",voice))
 			num_tasks = int(input("\nHow many tasks do you want to enter? "))
 			if num_tasks in range(1, 100):
 				break
@@ -163,6 +180,9 @@ def tasks():
 	
 	# Request tasks from the user and add them to the list
 	for i in range(num_tasks):
+		text = "Enter task {}: ".format(i+1)
+		voice = "Matthew"
+		asyncio.run(synthesize_text(text,voice))
 		task = input("Enter task {}: ".format(i+1))
 		tasks.append(task)
 	return tasks
@@ -178,7 +198,7 @@ async def synthesize_text(text, voice):
 												Text=ssml_text,
 												TextType='ssml',
 												VoiceId=voice,
-												Engine='standard'
+												Engine=engine
 											)
 			if response and 'AudioStream' in response:
 				# Save the audio file to disk
@@ -264,6 +284,8 @@ def google(query):
 			print(i+1, result)
 			
 		while True:
+			voice = "Matthew"
+			asyncio.run(synthesize_text("Select an option.",voice))
 			selection = input("\nSelect an option (1-10): ")
 			
 			try:
@@ -284,7 +306,7 @@ def google(query):
 
 
 def previous_sesh():
-	print("\nHi, this is an improved version of ChatGPT with support for multiple roles, web scraping, google searching and executing multiple tasks. Complete the setup and use the following options: \nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse 'tasks' to enter multi task mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'ask gpt to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from Bing.\nUse '!reset' to clear history and reset program.\n")
+	print("\nHi, chatgpt-plus supports auto switching between ChatGPT and Bing with support for multiple roles, web scraping, google searching and executing multiple tasks. Complete setup and use the following options as required: \n\nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse 'tasks' to enter multi task mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'ask gpt to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from Bing.\nUse '!clear' to clear current history and move to a new topic.\nUse '!reset' to clear history and reset program.\n")
 	with open('data/gptver.txt', 'r') as file:
 		gptver = file.read()# Use the previous role
 		#print("Role: " + activity + "\n")	
@@ -380,7 +402,7 @@ def gpt(prompt, model, role):
 		with open('data/activity.txt', 'w') as f:
 			# Add the text to the file
 			f.write(result+'\n')
-		voice = "Joanna"
+		voice = "Ruth"
 		asyncio.run(synthesize_text(result,voice))
 		
 		return
@@ -414,12 +436,18 @@ def process_input(user_input, model, role):
 		return
 	
 	if user_input.find('weather') != -1 or user_input.find('news') != -1 or user_input.find('price') != -1 or user_input.find('stock') != -1 or user_input.find('latest') != -1 or user_input.find('current') != -1:
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Switching to Bing.",voice))
+		print("\nSwitching to Bing.")
 		bing_input = user_input + ". Do not ask any questions after responding."
 		asyncio.run(bing(bing_input))
 		return 
 	
 	if user_input.find('ask bing') != -1:
 		string_without_askbing = user_input.replace("ask bing", "") + ". Do not ask any questions after responding."
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Switching to Bing.",voice))
+		print("\nSwitching to Bing.")
 		user_input = asyncio.run(bing(string_without_askbing))
 		with open('data/activity.txt', 'w') as f:
 			# Add the text to the file
@@ -427,6 +455,9 @@ def process_input(user_input, model, role):
 		return 
 	
 	if user_input.find('search wiki') != -1:
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Searching Wikipedia.",voice))
+		print("\nSearching Wikipedia.")
 		string_without_wiki = user_input.replace("search wiki", "")
 		wiki(str(string_without_wiki))
 		with open('data/wiki.txt', 'r') as file:
@@ -435,6 +466,9 @@ def process_input(user_input, model, role):
 		user_input = "summarise" + wikiout
 		
 	if user_input.find('search web') != -1:
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Searching Google.",voice))
+		print("\nSearching Google.")
 		string_without_search = user_input.replace("search web", "")
 		#print(string_without_search)
 		url = google(string_without_search)
@@ -445,19 +479,33 @@ def process_input(user_input, model, role):
 		user_input = "summarise" + webtxt
 	
 	if user_input.find('read clipboard') != -1:
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Extracting text from clipboard.",voice))
+		print("\nExtracting text from clipboard.")
 		text = pyperclip.paste()
 		string_without_clip = user_input.replace("read clipboard", "")
 		user_input = string_without_clip + text
 	
 	if user_input == "shutdown":
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Shutting Down.",voice))
+		print("\nShutting Down.")
 		exit(0)
+		
+	if user_input == "!clear":
+		print('Clearing history...')
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Clearing history.",voice))
+		clear()
+		return
+		
 	if user_input == "!reset":
 		print('Clearing history...')
 		voice = "Matthew"
-		asyncio.run(synthesize_text("Clearing history",voice))
+		asyncio.run(synthesize_text("Clearing history.",voice))
 		reset()
 		print('Resetting..\n')
-		asyncio.run(synthesize_text("Reseting",voice))
+		asyncio.run(synthesize_text("Reseting.",voice))
 		main()
 		
 	gpt(user_input,model,role)
