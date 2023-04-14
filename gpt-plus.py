@@ -6,20 +6,59 @@ import requests
 import wikipedia
 import pyperclip
 import rollbar
+import boto3
 from EdgeGPT import Chatbot, ConversationStyle
 from googlesearch import search
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 load_dotenv()
+from playsound import playsound
 import asyncio
-
+import nest_asyncio
+nest_asyncio.apply()
 
 #API key for ChatGPT
 openai.api_key = os.environ["OPENAI_API_KEY"]
 model = "gpt-3.5-turbo"
 
+#Define Polly parameters
+polly_client = boto3.client('polly', region_name='us-east-1')
+engine = 'neural'
+
+tts_enable = False
+def enable_polly():
+	while True:
+		response = input("\nWould you like to enable Text-to-Speech with AWS Polly?:" + " (y/n) ").lower()
+		if response in ["y", "yes"]:
+			return True
+		elif response in ["n", "no"]:
+			return False
+		else:
+			print("Invalid response. Please enter 'y' or 'n'.")
+	print("\nWould you like to enable Text-to-Speech with AWS Polly?")
+
+if not openai.api_key:
+	print("\nOpenAI API key is missing. Please add Key to .env file")
+	exit(0)
+	
+		
+if "AWS_ACCESS_KEY_ID" in os.environ and "AWS_SECRET_ACCESS_KEY" in os.environ:
+	os.environ['AWS_ACCESS_KEY_ID']
+	os.environ['AWS_SECRET_ACCESS_KEY']
+	if enable_polly():
+		tts_enable = True
+	else:
+		tts_enable = False
+		
+	
+else:
+	print ("\nAWS Access Keys not found. Disabling Text-to-Speech")
+	tts_enable = False
+	
+
 def get_gpt_ver():
 	print("\nPlease choose one of the following GPT models:")
+	asyncio.run(synthesize_text("Please choose one of the following GPT models:", "Matthew"))
 	print("1. gpt-3.5-turbo")
 	print("2. gpt-4")
 	
@@ -46,6 +85,7 @@ def get_gpt_ver():
 			
 def get_user_role():
 	print("\nPlease choose one of the following roles:")
+	asyncio.run(synthesize_text("Please choose one of the following roles", "Matthew"))
 	print("1. General AI")
 	print("2. Python Programmer")
 	print("3. AI Image prompt generator")
@@ -128,6 +168,32 @@ def tasks():
 	return tasks
 
 
+async def synthesize_text(text, voice):
+	if tts_enable:
+		try:
+			# Call the synthesize_speech() method asynchronously to generate the audio file
+			ssml_text = f'<speak><prosody rate="{1.2}">{text}</prosody></speak>'
+			response = await asyncio.to_thread(polly_client.synthesize_speech,
+												OutputFormat='mp3',
+												Text=ssml_text,
+												TextType='ssml',
+												VoiceId=voice,
+												Engine='standard'
+											)
+			if response and 'AudioStream' in response:
+				# Save the audio file to disk
+				with open('output.mp3', 'wb') as file:
+					file.write(response['AudioStream'].read())
+				# Play the audio file
+				playsound('output.mp3')
+				# Remove the audio file from disk
+				os.remove('output.mp3')
+			else:
+				print('Error: No audio stream found in the response.')
+		except Exception as e:
+			print(f'Error: {str(e)}')
+	
+	
 async def bing(prompt):
 	try:
 		bot = Chatbot(cookiePath='cookies.json')
@@ -149,13 +215,14 @@ async def bing(prompt):
 		with open('data/activity.txt', 'w') as f:
 			# Add the text to the file
 			f.write(bing_response+'\n')
+		voice = "Salli"
+		asyncio.run(synthesize_text(bing_response,voice))
 		await bot.close()
 		
 	except Exception as e:
 		print("Error:", str(e))
 		return ""
 	
-
 
 def wiki(text):
 	try:
@@ -215,6 +282,7 @@ def google(query):
 		print(f"Error: {e}")
 		return ""
 
+
 def previous_sesh():
 	print("\nHi, this is an improved version of ChatGPT with support for multiple roles, web scraping, google searching and executing multiple tasks. Complete the setup and use the following options: \nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse 'tasks' to enter multi task mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'ask gpt to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from Bing.\nUse '!reset' to clear history and reset program.\n")
 	with open('data/gptver.txt', 'r') as file:
@@ -224,6 +292,7 @@ def previous_sesh():
 		role = file.read()# Use the previous role
 		#print("Role: " + activity + "\n")	
 	if gptver != "" and role !="":
+		asyncio.run(synthesize_text("Would you like to continue the previous session?", "Matthew"))
 		while True:
 			response = input("Would you like to continue the previous session?:" + " (y/n) ").lower()
 			if response in ["y", "yes"]:
@@ -236,13 +305,16 @@ def previous_sesh():
 	else:
 		return False
 
+
 def contains_url(text):
 	url_pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 	return bool(url_pattern.search(text))
 
+
 def remove_url(text):
 	url_pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 	return url_pattern.sub('', text)
+
 
 def scrape_web(url):
 	try:
@@ -273,7 +345,8 @@ def scrape_web(url):
 	
 	except requests.exceptions.ConnectionError as e:
 		print("Error: ", e)				
-		
+
+	
 def gpt(prompt, model, role):
 	try:
 		with open('data/activity.txt', 'r') as file:
@@ -293,7 +366,7 @@ def gpt(prompt, model, role):
 		
 		if not response or not response.choices:
 			print("Error: Empty response from OpenAI")
-			return ""
+			return
 		
 		result = ''
 		for choice in response.choices:
@@ -302,16 +375,21 @@ def gpt(prompt, model, role):
 				
 		if not result:
 			print("Error: No content in response from OpenAI")
-			return ""
+			return
+		print('\nChatGPT:\n' + result)
 		with open('data/activity.txt', 'w') as f:
 			# Add the text to the file
 			f.write(result+'\n')
-		return result
+		voice = "Joanna"
+		asyncio.run(synthesize_text(result,voice))
+		
+		return
 	
 	except Exception as e:
 		rollbar.report_exc_info()
 		print("Error asking ChatGPT:", str(e))
-		return ""
+		return
+	
 	
 def process_input(user_input, model, role):
 	if	contains_url(user_input):
@@ -331,8 +409,7 @@ def process_input(user_input, model, role):
 			
 	if user_input.find('ask gpt') != -1:
 		string_without_askgpt = user_input.replace("ask gpt", "")
-		gptout = gpt(string_without_askgpt,model,role)
-		print('\nChatGPT:\n' + gptout)
+		gpt(string_without_askgpt,model,role)
 		print('\n\n')
 		return
 	
@@ -376,12 +453,14 @@ def process_input(user_input, model, role):
 		exit(0)
 	if user_input == "!reset":
 		print('Clearing history...')
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Clearing history",voice))
 		reset()
 		print('Resetting..\n')
+		asyncio.run(synthesize_text("Reseting",voice))
 		main()
 		
-	gptout = gpt(user_input,model,role)
-	print('\nChatGPT:\n' + gptout)
+	gpt(user_input,model,role)
 	print('\n\n')
 
 	
@@ -397,11 +476,8 @@ def main():
 	else:		
 		model = get_gpt_ver()
 		role = get_user_role()	
-	
 			
-	prompt_ = gpt("Describe given role in 25 words",model,role)
-	print('\nChatGPT:\n' + prompt_)
-		
+	gpt("Describe given role in 25 words",model,role)
 	
 	while True:
 		user_input = input("\nInput: ")
@@ -411,6 +487,9 @@ def main():
 			tasklist = tasks()
 			for i, task in enumerate(tasklist):
 				print("\nProcessing task {}: {}".format(i+1, task))
+				text = "Processing task {}: {}".format(i+1, task)
+				voice = "Matthew"
+				asyncio.run(synthesize_text(text,voice))
 				task = str(format(task))
 				process_input(task, model, role)
 				

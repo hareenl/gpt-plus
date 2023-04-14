@@ -1,8 +1,13 @@
 openai
+requests
 google
 googlesearch-python
+beautifulsoup4
 python-dotenv
 wikipedia
 pyperclip
 EdgeGPT
 rollbar
+boto3
+playsound
+nest_asyncio

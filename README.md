@@ -8,6 +8,7 @@
 - Automatic switching between ChatGPT and Bing depending on request
 - Multitask mode to execute as many tasks as required with access to information acquired from a prior task.
 - Ability to switch between gpt-3.5-turbo and gpt-4
+- Text to speech support with AWS Polly (Neural Engine)
 - Searching articles on Wikipeadia
 - Searching articles on Google
 - Options for switching between multiple chatgpt roles
@@ -35,12 +36,6 @@ cd gpt-plus
 pip3 install -r requirements.txt
 ```
 
-Use the following to start gpt-plus
-
-```sh
-python3 gpt-plus.py
-```
-
 ## Configuration
 Visit https://platform.openai.com/account/api-keys to generate a API Key
 Add API key to .env file (hidden) located in the gpt-plus folder
@@ -49,7 +44,18 @@ Example
 
 ```sh
 # .env
-OPENAI_API_KEY=sk-abcdefghijklmnop123456
+OPENAI_API_KEY=sk-abcdefghijklmnopqrstuvwxyz123456
+```
+
+Optional Step - Add AWS Polly support for Text-to-Speech by filling in the AWS Access and Secret keys in the .env file.
+If this step is completed, the console provide an option to enable Text-to-Speech when initialised.
+
+Example
+```sh
+# .env
+OPENAI_API_KEY=sk-abcdefghijklmnopqrstuvwxyz123456
+AWS_ACCESS_KEY_ID=ABCDEFGHIJK123456
+AWS_SECRET_ACCESS_KEY=abcdefghijklmnop1234
 ```
 
 Next step is to add EdgeGPT functionality to gpt-plus. Steps are as follows:
@@ -60,6 +66,12 @@ Next step is to add EdgeGPT functionality to gpt-plus. Steps are as follows:
 - Paste your cookies into a file cookies.json located in gpt-plus
 
 Read additional details on [EdgeGPT](https://github.com/acheong08/EdgeGPT)
+
+## Start gpt-plus
+
+```sh
+python3 gpt-plus.py
+```
 
 ## Prompt Example
 ![](https://raw.githubusercontent.com/hareenl/gpt-plus/main/images/preview.png)
