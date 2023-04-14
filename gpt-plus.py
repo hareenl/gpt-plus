@@ -221,13 +221,13 @@ async def bing(prompt):
 		
 		if "item" not in response or "messages" not in response["item"]:
 			print("Error: Invalid response format")
-			return ""
+			return
 		
 		bing_messages = [message for message in response["item"]["messages"] if message["author"] == "bot"]
 		
 		if not bing_messages:
 			print("Error: No bot messages found in response")
-			return ""
+			return
 		
 		bing_response = bing_messages[-1]["text"]
 		bing_response = re.sub('\[\^\d+\^\]', '', bing_response)
@@ -241,7 +241,7 @@ async def bing(prompt):
 		
 	except Exception as e:
 		print("Error:", str(e))
-		return ""
+		return
 	
 
 def wiki(text):
@@ -448,10 +448,7 @@ def process_input(user_input, model, role):
 		voice = "Matthew"
 		asyncio.run(synthesize_text("Switching to Bing.",voice))
 		print("\nSwitching to Bing.")
-		user_input = asyncio.run(bing(string_without_askbing))
-		with open('data/activity.txt', 'w') as f:
-			# Add the text to the file
-			f.write(user_input+'\n')
+		asyncio.run(bing(string_without_askbing))
 		return 
 	
 	if user_input.find('search wiki') != -1:
