@@ -9,7 +9,7 @@
 - Multitask mode to execute as many tasks as required with access to information acquired from a prior task.
 - Ability to switch between gpt-3.5-turbo and gpt-4
 - Text to speech support with AWS Polly (Neural Engine)
-- Multi-step Python code generation utilising 'Role 2: Python Programmer'. The Generated code will be saved as 'output/generated_code.py'
+- Multi-step Python code generation utilising 'Role 2: Python Programmer'. The Generated code will be saved in 'output/generated_code.py'
 - Searching articles on Wikipeadia
 - Searching articles on Google
 - Options for switching between multiple chatgpt roles
