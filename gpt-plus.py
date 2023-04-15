@@ -657,8 +657,8 @@ def process_input(user_input, model, role):
 	
 	if user_input.find('import python') != -1:
 		debug = False
-		if user_input.find(' --debug') !=-1:
-			user_input = user_input.replace(" --debug", "")
+		if user_input.find('--debug') !=-1:
+			user_input = user_input.replace("--debug", "")
 			debug = True
 		if role == python_role:
 			string_without_import = user_input.replace("import python", "")
@@ -676,9 +676,9 @@ def process_input(user_input, model, role):
 			asyncio.run(synthesize_text("Please switch to Role 2: Python Developer to use this function.",voice))
 		return
 
-	if user_input.find(' --debug') !=-1:
+	if user_input.find('--debug') !=-1:
 		if role == python_role:
-			string_without_errorchk = user_input.replace(" --debug", "")
+			string_without_errorchk = user_input.replace("--debug", "")
 			gpt(string_without_errorchk,model,role)
 			print('\n\n')
 			test_py()
