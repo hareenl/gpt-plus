@@ -30,6 +30,7 @@ engine = 'neural'
 tts_enable = False
 bing_enable = False
 
+#Ask if Polly can be enabled
 def enable_polly():
 	while True:
 		response = input("\nWould you like to enable Text-to-Speech with AWS Polly?:" + " (y/n) ").lower()
@@ -41,7 +42,7 @@ def enable_polly():
 			print("Invalid response. Please enter 'y' or 'n'.")
 	print("\nWould you like to enable Text-to-Speech with AWS Polly?")
 
-	
+#Error and exit if openai api key isn't present	
 if not openai.api_key:
 	print("\nOpenAI API key is missing. Please add Key to .env file")
 	exit(0)

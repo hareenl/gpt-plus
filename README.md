@@ -4,7 +4,6 @@
 ![](https://raw.githubusercontent.com/hareenl/gpt-plus/main/images/preview.gif)
 
 ## Features
-
 - Automatic switching between ChatGPT and Bing depending on request
 - Multitask mode to execute as many tasks as required with access to information acquired from a prior task.
 - Multi-step Python code generation and creation of .py file as output'
