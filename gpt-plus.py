@@ -7,6 +7,7 @@ import wikipedia
 import pyperclip
 import rollbar
 import boto3
+import glob
 from EdgeGPT import Chatbot, ConversationStyle
 from googlesearch import search
 from bs4 import BeautifulSoup
@@ -26,6 +27,8 @@ polly_client = boto3.client('polly', region_name='us-east-1')
 engine = 'neural'
 
 tts_enable = False
+bing_enable = False
+
 def enable_polly():
 	while True:
 		response = input("\nWould you like to enable Text-to-Speech with AWS Polly?:" + " (y/n) ").lower()
@@ -37,9 +40,24 @@ def enable_polly():
 			print("Invalid response. Please enter 'y' or 'n'.")
 	print("\nWould you like to enable Text-to-Speech with AWS Polly?")
 
+	
 if not openai.api_key:
 	print("\nOpenAI API key is missing. Please add Key to .env file")
 	exit(0)
+
+if os.path.isfile('cookies.json'):
+	with open('cookies.json', 'r') as file:
+		bing_cookies = file.read()# Use the previous role
+		bing_cookies = str(bing_cookies)
+else:
+	bing_cookies = ""
+	
+if bing_cookies != "":
+	print ("\nConfiguration found in 'cookies.json' file. Enabling Bing functionality.")
+	bing_enable = True
+else:
+	bing_enable = False
+	print ("\nConfiguration not found in 'cookies.json' file. Disabling Bing functionality.")
 	
 		
 if "AWS_ACCESS_KEY_ID" in os.environ and "AWS_SECRET_ACCESS_KEY" in os.environ:
@@ -49,18 +67,21 @@ if "AWS_ACCESS_KEY_ID" in os.environ and "AWS_SECRET_ACCESS_KEY" in os.environ:
 		tts_enable = True
 	else:
 		tts_enable = False
-		
-	
 else:
 	print ("\nAWS Access Keys not found. Disabling Text-to-Speech")
 	tts_enable = False
 	
 
+	
+	
+python_role = "I want you to act as a python programming assistant. Output python code for given requests and only output python code. Add comments inside code. Do not provide descriptions outside code. Always place code between <!-- start of Python code --> and <!-- end of Python code -->"
+html_role = "I want you to act as a HTML web developer. Output HTML for given requests and only output HTML. Add comments inside HTML code. Do not provide descriptions outside HTML code. Always place give HTML code between <!-- start of HTML code --> and <!-- end of HTML code -->"
+
 def get_gpt_ver():
 	print("\nPlease choose one of the following GPT models:")
 	asyncio.run(synthesize_text("Please choose one of the following GPT models:", "Matthew"))
 	print("1. gpt-3.5-turbo")
-	print("2. gpt-4")
+	print("2. gpt-4 (slower - Requires API access)")
 	
 	while True:
 		try:
@@ -74,7 +95,7 @@ def get_gpt_ver():
 			
 	ver = {
 		1: "gpt-3.5-turbo",
-		2: "gpt-4 (slow - Requires API access)"
+		2: "gpt-4"
 	}
 	
 	with open("data/gptver.txt", "w") as file:
@@ -87,15 +108,15 @@ def get_user_role():
 	print("\nPlease choose one of the following roles:")
 	asyncio.run(synthesize_text("Please choose one of the following roles", "Matthew"))
 	print("1. General AI")
-	print("2. Python Programmer")
-	print("3. AI Image prompt generator")
-	print("4. Legal Advisor")
-	print("5. Screen writer")
-	print("6. IT Expert")
-	print("7. Financial Advisor")
-	print("8. Novelist")
-	print("9. Proofreader")
-	print("10. Text based Game")
+	print("2. Python Developer")
+	print("3. Web Developer")
+	print("4. AI Image prompt generator")
+	print("5. Legal Advisor")
+	print("6. Financial Advisor")
+	print("7. IT Expert")
+	print("8. Screen writer")
+	print("9. Novelist")
+	print("10. Proofreader")
 	
 	while True:
 		try:
@@ -107,18 +128,18 @@ def get_user_role():
 		except ValueError:
 			print("Invalid input. Please enter a number.")
 	
-	#Following ideas were for roles are from chatGPT propmpts on prompthero		
 	roles = {
 		1: "You are a helpful AI ready to assist with multiple tasks",
-		2: "I want you to act as a python programming assistant. Outputs python code for given requests and only output python code. Add comments inside code. Do not provide descriptions outside code. Always place code inside ```python",
-		3: "As a guide/prompter for a text-to-image AI, your task is to create a detailed prompt for the provided theme. The 'Prompt: ' should be concise, consisting of 5-10 short sentences that provide an initial description of the image, followed by the 'Keywords: ' , which are 5-10 descriptive adjectives or keywords to add depth and flavour. The 'Negative Words:' are the descriptive adjectives or keywords that you don't want included in the image. For example, if the prompt is 'A mighty dragon with gleaming scales taking flight over towering mountains in a dramatic display of power and grace.', you could add 'A mighty dragon', 'gleaming scales', towering mountains, 'dramatic as a Keywords and 'weak' or 'uninspiring' as a Negative Word, Please follow this exact pattern and do not make up your own",
-		4: "I want you to act as my legal advisor. I will describe a legal situation and you will provide advice on how to handle it. You should only reply with your advice, and nothing else. Do not write explanations",
-		5: "I want you to act as a screenwriter. You will develop an engaging and creative script for either a feature length film, or a Web Series that can captivate its viewers. Start with coming up with interesting characters, the setting of the story, dialogues between the characters etc. Once your character development is complete - create an exciting storyline filled with twists and turns that keeps the viewers in suspense until the end",
-		6: "I want you to act as an IT Expert. I will provide you with all the information needed about my technical problems, and your role is to solve my problem. You should use your computer science, network infrastructure, and IT security knowledge to solve the problem. Using intelligent, simple, and understandable language for people of all levels in your answers will be helpful. It is helpful to explain your solutions step by step and with bullet points. Try to avoid too many technical details, but use them when necessary. Reply with the solution and do not write any explanations",
-		7: "Provide guidance as an expertise on financial markets , incorporating factors such as inflation rate or return estimates along with tracking stock prices over lengthy period ultimately helping user understand sector then suggesting safest possible options available where he/she can allocate funds depending upon their requirement & interests",
-		8: "I want you to act as a novelist. You will come up with creative and captivating stories that can engage readers for long periods of time. You may choose any genre such as fantasy, romance, historical fiction and so on - but the aim is to write something that has an outstanding plot-line, engaging characters and unexpected climaxes",
-		9: "I want you act as a proofreader. I will provide you texts and I would like you to review them for any spelling, grammar, or punctuation errors. Once you have finished reviewing the text, provide me with any necessary corrections or suggestions for improve the text",
-		10: "I want you to act as a text based adventure game. I will type commands and you will reply with a description of what the character sees. I want you to only reply with the game output and nothing else. do not write explanations. do not type commands unless I instruct you to do so. First command is wake up"
+		2: python_role,
+		3: html_role,
+		4: "As a guide/prompter for a text-to-image AI, your task is to create a detailed prompt for the provided theme. The 'Prompt: ' should be concise, consisting of 5-10 short sentences that provide an initial description of the image, followed by the 'Keywords: ' , which are 5-10 descriptive adjectives or keywords to add depth and flavour. The 'Negative Words:' are the descriptive adjectives or keywords that you don't want included in the image. For example, if the prompt is 'A mighty dragon with gleaming scales taking flight over towering mountains in a dramatic display of power and grace.', you could add 'A mighty dragon', 'gleaming scales', towering mountains, 'dramatic as a Keywords and 'weak' or 'uninspiring' as a Negative Word, Please follow this exact pattern and do not make up your own",
+		5: "I want you to act as my legal advisor. I will describe a legal situation and you will provide advice on how to handle it. You should only reply with your advice, and nothing else. Do not write explanations",
+		6: "Provide guidance as an expertise on financial markets , incorporating factors such as inflation rate or return estimates along with tracking stock prices over lengthy period ultimately helping user understand sector then suggesting safest possible options available where he/she can allocate funds depending upon their requirement & interests",
+		7: "I want you to act as an IT Expert. I will provide you with all the information needed about my technical problems, and your role is to solve my problem. You should use your computer science, network infrastructure, and IT security knowledge to solve the problem. Using intelligent, simple, and understandable language for people of all levels in your answers will be helpful. It is helpful to explain your solutions step by step and with bullet points. Try to avoid too many technical details, but use them when necessary. Reply with the solution and do not write any explanations",
+		8: "I want you to act as a screenwriter. You will develop an engaging and creative script for either a feature length film, or a Web Series that can captivate its viewers. Start with coming up with interesting characters, the setting of the story, dialogues between the characters etc. Once your character development is complete - create an exciting storyline filled with twists and turns that keeps the viewers in suspense until the end",
+		9: "I want you to act as a novelist. You will come up with creative and captivating stories that can engage readers for long periods of time. You may choose any genre such as fantasy, romance, historical fiction and so on - but the aim is to write something that has an outstanding plot-line, engaging characters and unexpected climaxes",
+		10: "I want you act as a proofreader. I will provide you texts and I would like you to review them for any spelling, grammar, or punctuation errors. Once you have finished reviewing the text, provide me with any necessary corrections or suggestions for improve the text",
+		
 	}
 	
 	with open("data/role.txt", "w") as file:
@@ -177,13 +198,26 @@ def tasks():
 	
 	# Create an empty list to store the tasks
 	tasks = []
-	
+	counter = 0
 	# Request tasks from the user and add them to the list
 	for i in range(num_tasks):
 		text = "Enter task {}: ".format(i+1)
 		voice = "Matthew"
 		asyncio.run(synthesize_text(text,voice))
-		task = input("Enter task {}: ".format(i+1))
+		with open('data/role.txt', 'r') as file:
+			role = file.read()
+			
+		if counter > 0:
+			addtxt = "Add to code, "
+		else:
+			addtxt = ""
+		counter = counter + 1
+		
+		if role not in [html_role, python_role]:
+			task = input("Enter task {}: ".format(i+1))
+		else:
+			task = addtxt + input("Enter task {}: ".format(i+1))
+			
 		tasks.append(task)
 	return tasks
 
@@ -306,7 +340,7 @@ def google(query):
 
 
 def previous_sesh():
-	print("\nHi, chatgpt-plus supports auto switching between ChatGPT and Bing with support for multiple roles, web scraping, google searching and executing multiple tasks. Complete setup and use the following options as required: \n\nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse 'tasks' to enter multitask mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'ask gpt to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from Bing.\nUse '!clear' to clear current history and move to a new topic.\nUse '!reset' to clear history and reset program.\n")
+	print("\nHi, chatgpt-plus supports auto switching between ChatGPT and Bing with support for multiple roles, web scraping, google searching and executing multiple tasks. Complete setup and use the following options as required: \n\n\nUse 'tasks' to enter multitask mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'import python' while in python developer role to import python files from input folder.\nUse 'import html' to import html while in web developer role to import html files from the input folder.\nUse 'ask gpt to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from Bing.\nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse '!clear' to clear current history and move to a new topic.\nUse '!reset' to clear history and reset program.\n")
 	with open('data/gptver.txt', 'r') as file:
 		gptver = file.read()# Use the previous role
 		#print("Role: " + activity + "\n")	
@@ -370,26 +404,142 @@ def scrape_web(url):
 
 
 def save_py():
-	# Define the regular expression pattern to match the code snippet
-	pattern = re.compile(r"```python\n([\s\S]*?)\n```")
-	
 	try:
 		# Read the text file
 		with open('data/activity.txt', 'r') as file:
-			text = file.read()
-			
-		# Find all code snippets in the text and join them into one string
-		code = ''.join(re.findall(pattern, text))
+			code = file.read()
 		
-		# Write the code to a new file
-		with open('output/generated_code.py', 'w') as file:
-			file.write(code)
+		if code.find("<!-- start of Python code -->") != -1:
+			start_index = code.find("<!-- start of Python code -->") + len("<!-- start of Python code -->") # find the starting index of the code
+			end_index = code.find("<!-- end of Python code -->") # find the ending index of the code
+			python = code[start_index:end_index].strip() # extract the code and remove any leading or trailing whitespaces
+				
+			# Write the code to a new file
+			with open('output/generated_code.py', 'w') as file:
+				file.write(python)
+			voice = "Matthew"
+			print ("\nPython File saved in Output Folder.")
+			asyncio.run(synthesize_text("Python File saved in Output Folder.",voice))
+	
 			
 	except FileNotFoundError:
 		print("Error: The input file 'activity.txt' could not be found.")
 		
 	except Exception as e:
 		print(f"An error occurred while processing the file: {e}")
+
+
+def save_html():
+	try:
+		# Read the text file
+		with open('data/activity.txt', 'r') as file:
+			html = file.read()
+		if html.find("<!-- start of HTML code -->") != -1:	
+			start_index = html.find("<!-- start of HTML code -->") + len("<!-- start of HTML code -->") # find the starting index of the code
+			end_index = html.find("<!-- end of HTML code -->") # find the ending index of the code
+			code = html[start_index:end_index].strip() # extract the code and remove any leading or trailing whitespaces
+		
+			# Write the code to a new file
+			if code != "":
+				with open('output/generated_html.html', 'w') as file:
+					file.write(code)
+			voice = "Matthew"
+			print ("\nHTML File saved in Output Folder.")
+			asyncio.run(synthesize_text("HTML File saved in Output Folder.",voice))
+				
+	except FileNotFoundError:
+		print("Error: The input file 'activity.txt' could not be found.")
+		
+	except Exception as e:
+		print(f"An error occurred while processing the file: {e}")
+
+	
+def input_py():
+	# set the folder path
+	folder_path = "input"
+	
+	# find all the .py files in the folder
+	py_files = glob.glob(folder_path + "/*.py")
+	
+	# check if any .py files were found
+	if not py_files:
+		print("\nNo .py files found in the folder.")
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Python files found in the folder.",voice))
+	else:
+		# print the names of the .py files
+		print("\nPlease select a .py file:")
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Please select a python file.",voice))
+		for i, file in enumerate(py_files):
+			print(f"{i+1}: {file}")
+			
+		# prompt the user to select a file
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Enter the number of the file you want to select.",voice))
+		selected_file_index = input("\nEnter the number of the file you want to select: ")
+		
+		# validate the user's input
+		while not selected_file_index.isdigit() or int(selected_file_index) < 1 or int(selected_file_index) > len(py_files):
+			print("\nInvalid input. Please enter a valid number.")
+			selected_file_index = input("\n1Enter the number of the file you want to select: ")
+			
+		# get the selected file name
+		selected_file_name = py_files[int(selected_file_index) - 1]
+		
+		# do something with the selected file
+		print(f"\nYou selected file: {selected_file_name}")
+		# Read the text file
+		with open(f"{selected_file_name}", 'r') as file:
+			python = file.read()
+		
+		with open('data/activity.txt', 'w') as f:
+			# Add the text to the file
+			f.write(python+'\n')
+		
+
+def input_html():
+	# set the folder path
+	folder_path = "input"
+	
+	# find all the .py files in the folder
+	py_files = glob.glob(folder_path + "/*.html")
+	
+	# check if any .py files were found
+	if not py_files:
+		print("\nNo .html files found in the folder.")
+		voice = "Matthew"
+		asyncio.run(synthesize_text("HTML files found in the folder.",voice))
+	else:
+		# print the names of the .py files
+		print("\nPlease select a .html file:")
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Please select a HTML file.",voice))
+		for i, file in enumerate(py_files):
+			print(f"{i+1}: {file}")
+			
+		# prompt the user to select a file
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Enter the number of the file you want to select.",voice))
+		selected_file_index = input("\nEnter the number of the file you want to select: ")
+		
+		# validate the user's input
+		while not selected_file_index.isdigit() or int(selected_file_index) < 1 or int(selected_file_index) > len(py_files):
+			print("\nInvalid input. Please enter a valid number.")
+			selected_file_index = input("\n1Enter the number of the file you want to select: ")
+			
+		# get the selected file name
+		selected_file_name = py_files[int(selected_file_index) - 1]
+		
+		# do something with the selected file
+		print(f"\nYou selected file: {selected_file_name}")
+		# Read the text file
+		with open(f"{selected_file_name}", 'r') as file:
+			html = file.read()
+			
+		with open('data/activity.txt', 'w') as f:
+			# Add the text to the file
+			f.write(html+'\n')
 
 	
 def gpt(prompt, model, role):
@@ -425,8 +575,10 @@ def gpt(prompt, model, role):
 		with open('data/activity.txt', 'w') as f:
 			# Add the text to the file
 			f.write(result+'\n')
-		if role == "I want you to act as a python programming assistant. Outputs python code for given requests and only output python code. Add comments inside code. Do not provide descriptions outside code. Always place code inside ```python":
+		if role == python_role:
 			save_py()
+		elif role == html_role:
+			save_html()
 		else:	
 			voice = "Ruth"
 			asyncio.run(synthesize_text(result,voice))
@@ -460,7 +612,45 @@ def process_input(user_input, model, role):
 		print('\n\n')
 		return
 	
-	if user_input.find('weather') != -1 or user_input.find('news') != -1 or user_input.find('price') != -1 or user_input.find('stock') != -1 or user_input.find('latest') != -1 or user_input.find('current') != -1:
+	if user_input.find('import python') != -1:
+		with open('data/role.txt', 'r') as file:
+			role = file.read()# Use the previous role
+			#print("Role: " + activity + "\n")	
+		if role == python_role:
+			string_without_import = user_input.replace("import python", "")
+			input_py()
+			print("\nImporting Python file.")
+			voice = "Matthew"
+			asyncio.run(synthesize_text("Importing Python File.",voice))
+			gpt(string_without_import,model,role)
+			print('\n\n')
+		else:
+			print("\nPlease switch to Role 2: Python Developer to use this function.")
+			voice = "Matthew"
+			asyncio.run(synthesize_text("Please switch to Role 2: Python Developer to use this function.",voice))
+		return
+	
+	if user_input.find('import html') != -1:
+		with open('data/role.txt', 'r') as file:
+			role = file.read()# Use the previous role
+			#print("Role: " + activity + "\n")	
+		if role == html_role:
+			string_without_import = user_input.replace("import html", "")
+			input_html()
+			print("\nImporting HTML file.")
+			voice = "Matthew"
+			asyncio.run(synthesize_text("Importing HTML File.",voice))
+			gpt(string_without_import,model,role)
+			print('\n\n')
+			
+		else:
+			print("\nPlease switch to Role 3: Web Developer to use this function.")
+			voice = "Matthew"
+			asyncio.run(synthesize_text("Please switch to Role 3: Web Developer to use this function.",voice))
+		return
+		
+	
+	if bing_enable and user_input.find('weather') != -1 or user_input.find('news') != -1 or user_input.find('price') != -1 or user_input.find('stock') != -1 or user_input.find('latest') != -1 or user_input.find('current') != -1:
 		voice = "Matthew"
 		asyncio.run(synthesize_text("Switching to Bing.",voice))
 		print("\nSwitching to Bing.")
@@ -469,12 +659,20 @@ def process_input(user_input, model, role):
 		return 
 	
 	if user_input.find('ask bing') != -1:
-		string_without_askbing = user_input.replace("ask bing", "") + ". Do not ask any questions after responding."
-		voice = "Matthew"
-		asyncio.run(synthesize_text("Switching to Bing.",voice))
-		print("\nSwitching to Bing.")
-		asyncio.run(bing(string_without_askbing))
-		return 
+		if bing_enable:
+			string_without_askbing = user_input.replace("ask bing", "") + ". Do not ask any questions after responding."
+			voice = "Matthew"
+			asyncio.run(synthesize_text("Switching to Bing.",voice))
+			print("\nSwitching to Bing.")
+			asyncio.run(bing(string_without_askbing))
+			return
+		else:
+			voice = "Matthew"
+			print("\nPlease setup cookies.json file to access Bing functionality.")
+			asyncio.run(synthesize_text("Please setup cookies.json file to access Bing functionality.",voice))
+			return 
+	
+		
 	
 	if user_input.find('search wiki') != -1:
 		voice = "Matthew"
@@ -552,6 +750,7 @@ def main():
 	while True:
 		user_input = input("\nInput: ")
 		
+		
 		if user_input == "tasks":
 			tasklist  = []
 			tasklist = tasks()
@@ -562,6 +761,10 @@ def main():
 				asyncio.run(synthesize_text(text,voice))
 				task = str(format(task))
 				process_input(task, model, role)
+			print ("Tasks Completed.")
+			voice = "Matthew"
+			asyncio.run(synthesize_text("Tasks Completed.",voice))
+			
 				
 		else:
 			process_input(user_input, model, role)

@@ -1,5 +1,5 @@
 # gpt-plus
-## _Combination of ChatGPT and Bing with multi-tasking_
+## _Multitasking ChatGPT with Bing functionality_
 
 ![](https://raw.githubusercontent.com/hareenl/gpt-plus/main/images/preview.gif)
 
@@ -7,26 +7,28 @@
 
 - Automatic switching between ChatGPT and Bing depending on request
 - Multitask mode to execute as many tasks as required with access to information acquired from a prior task.
-- Ability to switch between gpt-3.5-turbo and gpt-4
+- Multi-step Python code generation and creation of .py file as output'
+- Multi-step HTML code generation and creation of .html file as output'
+- Options for switching between gpt-3.5-turbo and gpt-4
 - Text to speech support with AWS Polly (Neural Engine)
-- Multi-step Python code generation utilising 'Role 2: Python Programmer'. The Generated code will be saved in 'output/generated_code.py'
-- Searching articles on Wikipeadia
-- Searching articles on Google
-- Options for switching between multiple chatgpt roles
+- Pre-built ChatGPT roles.
+- Searching and scraping articles on Wikipeadia and google
 
 ## Options
 Use the following options in gpt-plus for additional options:
 ```sh
+Use 'tasks' to enter multitask mode.
+Use 'read clipboard' to access text from clipboard.
+Use 'import python' while in python developer role to import python files from input folder.
+Use 'import html' to import html while in web developer role to import html files from the input folder.
+Use 'ask gpt to request response specifically from ChatGPT.
+Use 'ask bing' to request response specifically from Bing.
 Use 'search web' for searching the internet.
 Use 'search wiki' for searching Wikipedia.
-Use 'tasks' to enter multi task mode.
-Use 'read clipboard' to access text from clipboard.
-Use 'ask gpt' to request response specifically from ChatGPT.
-Use 'ask bing' to request response specifically from Bing.
 Use '!clear' to clear current history and move to a new topic.
 Use '!reset' to clear history and reset program.
 ```
-Additionally, gpt-plus will auto switch to bing mode if words such as 'weather' and 'news' are utilised in the prompt as ChatGPT doesn't have access to current information.
+Additionally, gpt-plus will auto switch to Bing mode if in scenarios where ChatGPT is unable to access the latest information.
 
 
 ## Installation
@@ -47,8 +49,8 @@ Add API key to .env file (hidden) located in the gpt-plus folder
 # .env
 OPENAI_API_KEY=sk-abcdefghijklmnopqrstuvwxyz123456
 ```
-
-Next step is to add EdgeGPT functionality to gpt-plus. Steps are as follows:
+### Optional Step - Bing
+To add EdgeGPT functionality to gpt-plus, steps are as follows:
 - Install the cookie editor extension for [Chrome/Edge](https://chrome.google.com/webstore/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm) or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/cookie-editor/)
 - Go to bing.com (Login to page)
 - Open the extension
@@ -57,7 +59,7 @@ Next step is to add EdgeGPT functionality to gpt-plus. Steps are as follows:
 
 Read additional details on [EdgeGPT](https://github.com/acheong08/EdgeGPT)
 
-### Optional Step 
+### Optional Step - AWS Polly
 Add AWS Polly support for Text-to-Speech by filling in the AWS Access and Secret keys in the .env file.
 If this step is completed, the console provide an option to enable Text-to-Speech when initialised.
 
@@ -75,12 +77,13 @@ AWS_SECRET_ACCESS_KEY=abcdefghijklmnop1234
 python3 gpt-plus.py
 ```
 
-## Prompt Examples
+## Examples
 ### Multi step python code generation (Utilising Role 2: Python Programmer)
 ![](https://raw.githubusercontent.com/hareenl/gpt-plus/main/images/preview1.png)
 ##### Code Output
 The generated code is exported as 'generated_code.py' in the 'output' folder. Code below is based on above prompt input in Multitask mode.
-```sh
+
+```python
 # Import the necessary libraries
 import openai
 import requests
@@ -97,17 +100,17 @@ prompt_str = input("Enter a prompt to generate an image: ")
 size_options = ["256x256", "512x512", "1024x1024"]
 print("Choose an image size:")
 for i, size_option in enumerate(size_options):
-print(f"{i+1}. {size_option}")
-
+	print(f"{i+1}. {size_option}")
+	
 # Use a try-except block to handle errors if the user enters an invalid option
 while True:
-try:
-size_index = int(input()) - 1
-size = size_options[size_index]
-break
-except:
-print("Invalid option. Please try again.")
-
+	try:
+		size_index = int(input()) - 1
+		size = size_options[size_index]
+		break
+	except:
+		print("Invalid option. Please try again.")
+		
 # Set up the prompt generation parameters
 model_engine = "davinci"
 prompt = openai.Completion.create(
@@ -139,12 +142,11 @@ data = {
 
 # Send the API request and print the result
 try:
-response = requests.post(endpoint, headers=headers, data=json.dumps(data))
-response_dict = json.loads(response.text)
-print(response_dict["data"][0]["url"])
+	response = requests.post(endpoint, headers=headers, data=json.dumps(data))
+	response_dict = json.loads(response.text)
+	print(response_dict["data"][0]["url"])
 except:
-print("API request failed. Please try again.")
-
+	print("API request failed. Please try again.")
 ```
 
 ### Itinerary generation based on weather
