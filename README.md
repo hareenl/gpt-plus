@@ -78,7 +78,7 @@ python3 gpt-plus.py
 ```
 
 ## Examples
-### Multi step python code generation (Utilising Role 2: Python Programmer)
+### Multi step python code generation (Utilising Role 2: Python Developer)
 ![](https://raw.githubusercontent.com/hareenl/gpt-plus/main/images/preview1.png)
 ##### Code Output
 The generated code is exported as 'generated_code.py' in the 'output' folder. Code below is based on above prompt input in Multitask mode.
