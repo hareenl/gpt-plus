@@ -4,18 +4,18 @@
 ![](https://raw.githubusercontent.com/hareenl/gpt-plus/main/images/preview.gif)
 
 ## Features
-- Automatic switching between ChatGPT and Bing depending on request
+- Automatic switching between ChatGPT and Bing depending on request.
 - Multitask mode to execute as many tasks as required with access to information acquired from a prior task.
-- Multi-step Python code generation and creation of .py file as output'
-- Execute and debug option for Python code
-- Multi-step HTML code generation and creation of .html file as output'
-- Options for switching between gpt-3.5-turbo and gpt-4
-- Text to speech support with AWS Polly (Neural Engine)
+- Multi-step Python code generation and creation of .py file as output'.
+- Execute and debug option for Python code.
+- Multi-step HTML code generation and creation of .html file as output'.
+- Options for switching between gpt-3.5-turbo and gpt-4.
+- Text to speech support with AWS Polly (Neural Engine).
 - Pre-built ChatGPT roles.
-- Searching and scraping articles on Wikipeadia and google
+- Searching and scraping articles on Wikipeadia and google.
 
 ## Options
-Use the following options in gpt-plus for additional options:
+Use the following options in gpt-plus for additional functionality:
 ```
 Use 'tasks' to enter multitask mode.
 Use 'read clipboard' to access text from clipboard.
@@ -90,7 +90,7 @@ import python and optimise --debug
 ```
 
 #### Web Developer role
-Following prompt will generate a webpage and save the page generated to 'output/generated_webpage.html'
+Following prompt will generate a webpage and save the page generated to 'output/generated_webpage.html'.
 ```
 create webpage with a button in the centre of the screen.
 ```
