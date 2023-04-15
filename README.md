@@ -21,7 +21,7 @@ Use 'tasks' to enter multitask mode.
 Use 'read clipboard' to access text from clipboard.
 Use 'import python' while in python developer role to import python files from input folder.
 Use 'import html' to import html while in web developer role to import html files from the input folder.
-Use 'ask gpt to request response specifically from ChatGPT.
+Use 'ask gpt' to request response specifically from ChatGPT.
 Use 'ask bing' to request response specifically from Bing.
 Use 'search web' for searching the internet.
 Use 'search wiki' for searching Wikipedia.
