@@ -16,7 +16,7 @@
 
 ## Options
 Use the following options in gpt-plus for additional options:
-```sh
+```
 Use 'tasks' to enter multitask mode.
 Use 'read clipboard' to access text from clipboard.
 Use 'import python' while in python developer role to import python files from input folder.
@@ -50,7 +50,7 @@ Add API key to .env file (hidden) located in the gpt-plus folder
 OPENAI_API_KEY=sk-abcdefghijklmnopqrstuvwxyz123456
 ```
 ### Optional Step - Bing
-To add EdgeGPT functionality to gpt-plus, steps are as follows:
+To add Bing functionality to gpt-plus, steps are as follows:
 - Install the cookie editor extension for [Chrome/Edge](https://chrome.google.com/webstore/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm) or [Firefox](https://addons.mozilla.org/en-US/firefox/addon/cookie-editor/)
 - Go to bing.com (Login to page)
 - Open the extension
@@ -61,7 +61,7 @@ Read additional details on [EdgeGPT](https://github.com/acheong08/EdgeGPT)
 
 ### Optional Step - AWS Polly
 Add AWS Polly support for Text-to-Speech by filling in the AWS Access and Secret keys in the .env file.
-If this step is completed, the console provide an option to enable Text-to-Speech when initialised.
+If this step is completed, the console will provide an option to enable Text-to-Speech when initialised.
 
 #### Example
 ```sh

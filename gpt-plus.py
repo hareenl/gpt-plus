@@ -649,14 +649,16 @@ def process_input(user_input, model, role):
 			asyncio.run(synthesize_text("Please switch to Role 3: Web Developer to use this function.",voice))
 		return
 		
-	
-	if bing_enable and user_input.find('weather') != -1 or user_input.find('news') != -1 or user_input.find('price') != -1 or user_input.find('stock') != -1 or user_input.find('latest') != -1 or user_input.find('current') != -1:
-		voice = "Matthew"
-		asyncio.run(synthesize_text("Switching to Bing.",voice))
-		print("\nSwitching to Bing.")
-		bing_input = user_input + ". Do not ask any questions after responding."
-		asyncio.run(bing(bing_input))
-		return 
+	with open('data/role.txt', 'r') as file:
+		role = file.read()
+	if role != html_role and role != python_role:
+		if bing_enable and user_input.find('weather') != -1 or user_input.find('news') != -1 or user_input.find('price') != -1 or user_input.find('stock') != -1 or user_input.find('latest') != -1 or user_input.find('current') != -1:
+			voice = "Matthew"
+			asyncio.run(synthesize_text("Switching to Bing.",voice))
+			print("\nSwitching to Bing.")
+			bing_input = user_input + ". Do not ask any questions after responding."
+			asyncio.run(bing(bing_input))
+			return 
 	
 	if user_input.find('ask bing') != -1:
 		if bing_enable:
@@ -745,7 +747,7 @@ def main():
 		model = get_gpt_ver()
 		role = get_user_role()	
 			
-	gpt("Describe given role in 25 words",model,role)
+	gpt("Explain your role in 25 words",model,role)
 	
 	while True:
 		user_input = input("\nInput: ")
