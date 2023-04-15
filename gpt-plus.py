@@ -8,6 +8,7 @@ import pyperclip
 import rollbar
 import boto3
 import glob
+import subprocess
 from EdgeGPT import Chatbot, ConversationStyle
 from googlesearch import search
 from bs4 import BeautifulSoup
@@ -340,7 +341,7 @@ def google(query):
 
 
 def previous_sesh():
-	print("\nWelcome to gpt-plus. This program supports auto switching between ChatGPT and Bing, executing multiple tasks, selection of pre-defined roles, generation of python (.py files), generation of html (.html files), web scraping and google/wikipedia searching. Complete setup and use the following options as required: \n\n\nUse 'tasks' to enter multitask mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'import python' while in python developer role to import python files from input folder.\nUse 'import html' to import html while in web developer role to import html files from the input folder.\nUse 'ask gpt' to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from Bing.\nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse '!clear' to clear current history and move to a new topic.\nUse '!reset' to clear history and reset program.\n")
+	print("\nWelcome to gpt-plus. This program supports auto switching between ChatGPT and Bing, executing multiple tasks, selection of pre-defined roles, generation of python (.py files), generation of html (.html files), web scraping and google/wikipedia searching. Complete setup and use the following options as required: \n\n\nUse 'tasks' to enter multitask mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'import python' while in python developer role to import python files from input folder.\nUse '--debug' at the end of a prompt or after 'import python' to execute code and debug (in python developer role).\nUse 'import html' to import html while in web developer role to import html files from the input folder.\nUse 'ask gpt' to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from Bing.\nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse '!clear' to clear current history and move to a new topic.\nUse '!reset' to clear history and reset program.\n")
 	with open('data/gptver.txt', 'r') as file:
 		gptver = file.read()# Use the previous role
 		#print("Role: " + activity + "\n")	
@@ -403,6 +404,48 @@ def scrape_web(url):
 		print("Error: ", e)				
 
 
+def test_py():
+	voice = "Matthew"
+	print ("\nExecuting code and error checking.")
+	asyncio.run(synthesize_text("Executing code and error checking.",voice))
+	
+	with open('output/generated_code.py', 'r') as file:
+		python = file.read()# Use the previous role
+		#print("Role: " + activity + "\n")
+	
+	file = 'output/generated_code.py'
+	# Replace 'external_file.py' with the name of your external Python file
+	process = subprocess.Popen(['python3', file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	
+	output, errors = process.communicate()
+	# Decode bytes to strings
+	output = output.decode('utf-8')
+	errors = errors.decode('utf-8')
+	if errors != "":
+		print (f"\nError: {errors}")
+		text = python + "\n" + "the code above generated this error: " + errors + "Fix code and add error handling."
+		with open('data/activity.txt', 'w') as file:
+			file.write(text)
+		with open('data/gptver.txt', 'r') as file:
+			model = file.read()# Use the previous role
+			#print("Role: " + activity + "\n")	
+		with open('data/role.txt', 'r') as file:
+			role = file.read()# Use the previous role
+			#print("Role: " + activity + "\n")
+			print ("\nErrors found. Applying fixes.")
+			asyncio.run(synthesize_text("Errors found. Applying fixes.",voice))
+		gpt("",model,role)
+		print('\n\n')
+		test_py()
+	elif "Exception" in output:
+		print(f"\nException occurred: {output_str}")
+	else:
+		print ("\nDebugging successfully completed. Code has been verified.")
+		asyncio.run(synthesize_text("Debugging successfully completed. Code has been verified.",voice))
+		return
+	
+		
+	
 def save_py():
 	try:
 		# Read the text file
@@ -421,7 +464,6 @@ def save_py():
 			print ("\nPython File saved in Output Folder.")
 			asyncio.run(synthesize_text("Python File saved in Output Folder.",voice))
 	
-			
 	except FileNotFoundError:
 		print("Error: The input file 'activity.txt' could not be found.")
 		
@@ -468,9 +510,9 @@ def input_py():
 		asyncio.run(synthesize_text("Python files found in the folder.",voice))
 	else:
 		# print the names of the .py files
-		print("\nPlease select a .py file:")
+		print("\nFollowing python files were found:")
 		voice = "Matthew"
-		asyncio.run(synthesize_text("Please select a python file.",voice))
+		asyncio.run(synthesize_text("Following python files were found.",voice))
 		for i, file in enumerate(py_files):
 			print(f"{i+1}: {file}")
 			
@@ -613,9 +655,10 @@ def process_input(user_input, model, role):
 		return
 	
 	if user_input.find('import python') != -1:
-		with open('data/role.txt', 'r') as file:
-			role = file.read()# Use the previous role
-			#print("Role: " + activity + "\n")	
+		debug = False
+		if user_input.find(' --debug') !=-1:
+			user_input = user_input.replace(" --debug", "")
+			debug = True
 		if role == python_role:
 			string_without_import = user_input.replace("import python", "")
 			input_py()
@@ -624,6 +667,20 @@ def process_input(user_input, model, role):
 			asyncio.run(synthesize_text("Importing Python File.",voice))
 			gpt(string_without_import,model,role)
 			print('\n\n')
+			if debug:
+				test_py()
+		else:
+			print("\nPlease switch to Role 2: Python Developer to use this function.")
+			voice = "Matthew"
+			asyncio.run(synthesize_text("Please switch to Role 2: Python Developer to use this function.",voice))
+		return
+
+	if user_input.find(' --debug') !=-1:
+		if role == python_role:
+			string_without_errorchk = user_input.replace(" --debug", "")
+			gpt(string_without_errorchk,model,role)
+			print('\n\n')
+			test_py()
 		else:
 			print("\nPlease switch to Role 2: Python Developer to use this function.")
 			voice = "Matthew"
@@ -631,9 +688,6 @@ def process_input(user_input, model, role):
 		return
 	
 	if user_input.find('import html') != -1:
-		with open('data/role.txt', 'r') as file:
-			role = file.read()# Use the previous role
-			#print("Role: " + activity + "\n")	
 		if role == html_role:
 			string_without_import = user_input.replace("import html", "")
 			input_html()
@@ -642,15 +696,12 @@ def process_input(user_input, model, role):
 			asyncio.run(synthesize_text("Importing HTML File.",voice))
 			gpt(string_without_import,model,role)
 			print('\n\n')
-			
 		else:
 			print("\nPlease switch to Role 3: Web Developer to use this function.")
 			voice = "Matthew"
 			asyncio.run(synthesize_text("Please switch to Role 3: Web Developer to use this function.",voice))
 		return
 		
-	with open('data/role.txt', 'r') as file:
-		role = file.read()
 	if role != html_role and role != python_role:
 		if bing_enable and user_input.find('weather') != -1 or user_input.find('news') != -1 or user_input.find('price') != -1 or user_input.find('stock') != -1 or user_input.find('latest') != -1 or user_input.find('current') != -1:
 			voice = "Matthew"
@@ -659,6 +710,7 @@ def process_input(user_input, model, role):
 			bing_input = user_input + ". Do not ask any questions after responding."
 			asyncio.run(bing(bing_input))
 			return 
+	
 	
 	if user_input.find('ask bing') != -1:
 		if bing_enable:
@@ -673,8 +725,6 @@ def process_input(user_input, model, role):
 			print("\nPlease setup cookies.json file to access Bing functionality.")
 			asyncio.run(synthesize_text("Please setup cookies.json file to access Bing functionality.",voice))
 			return 
-	
-		
 	
 	if user_input.find('search wiki') != -1:
 		voice = "Matthew"
