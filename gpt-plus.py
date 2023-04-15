@@ -441,7 +441,7 @@ def save_html():
 		
 			# Write the code to a new file
 			if code != "":
-				with open('output/generated_html.html', 'w') as file:
+				with open('output/generated_webpage.html', 'w') as file:
 					file.write(code)
 			voice = "Matthew"
 			print ("\nHTML File saved in Output Folder.")
