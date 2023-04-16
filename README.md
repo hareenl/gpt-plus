@@ -101,11 +101,11 @@ AWS_SECRET_ACCESS_KEY=abcdefghijklmnop1234
 ```
 
 ## Start gpt-plus
-### Windows:
+#### Windows:
 ```
 run start-gpt.bat
 ```
-### Linux and mac:
+#### Linux and mac:
 ```sh
 chmod +x start-gpt.sh
 ./start-gpt.sh
@@ -129,7 +129,7 @@ create webpage with a button in the centre of the screen.
 ```
 Following prompt will import a html file of selection located in the 'input' folder and optimise the code.
 ```
-import html
+import html and optimise
 ```
 
 ## Examples
