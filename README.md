@@ -57,11 +57,11 @@ Install python and git
 brew install python@3.10 git
 ```
 ## gpt-plus setup
-Once above steps are completed download gpt-plus and install dependencies using following commands.
+Once above steps are completed download gpt-plus and install dependencies using following commands. 
+gpt-plus directory will be cloned to the current path of command prompt or terminal.
 ```sh
 git clone https://github.com/hareenl/gpt-plus.git
 cd gpt-plus
-pip3 install -r requirements.txt
 ```
 
 ## Configuration
