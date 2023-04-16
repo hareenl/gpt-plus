@@ -9,6 +9,7 @@
 - Multi-step Python code generation and creation of .py file as output'.
 - Execute and debug option for Python code.
 - Multi-step HTML code generation and creation of .html file as output'.
+- Generation of images utilising ChatGPT and DALL•E API.
 - Options for switching between gpt-3.5-turbo and gpt-4.
 - Text to speech support with AWS Polly (Neural Engine).
 - Pre-built ChatGPT roles.
@@ -42,15 +43,15 @@ Additionally, gpt-plus will auto switch to Bing mode if in scenarios where ChatG
 
 #### Debian-based:
 ```bash
-sudo apt install wget git python3 python3-venv
+sudo apt install wget git python3 python3-venv python3-pip
 ```
 #### Red Hat-based:
 ```bash
-sudo dnf install wget git python3
+sudo dnf install wget git python3 python3-venv python3-pip
 ```
 #### Arch-based:
 ```bash
-sudo pacman -S wget git python3
+sudo pacman -S wget git python3 python3-venv python3-pip
 ```
 
 ### Initial Steps - Mac

@@ -9,6 +9,7 @@ import rollbar
 import boto3
 import glob
 import subprocess
+from PIL import Image
 from EdgeGPT import Chatbot, ConversationStyle
 from googlesearch import search
 from bs4 import BeautifulSoup
@@ -84,6 +85,7 @@ else:
 #Adding these 2 roles here as they will be called up multiple time later for programming modes.	
 python_role = "I want you to act as a python programming assistant. Output python code for given requests and only output python code. Add comments inside code. Do not provide descriptions outside code. Always place code between <!-- start of Python code --> and <!-- end of Python code -->"
 html_role = "I want you to act as a HTML web developer. Output HTML for given requests and only output HTML. Add comments inside HTML code. Do not provide descriptions outside HTML code. Always place give HTML code between <!-- start of HTML code --> and <!-- end of HTML code -->"
+image_role = "I want you to generate a prompt for a text-to-image AI. your task is to create a detailed prompt for the provided theme. The prompt should be concise paragraph consisting of a few short sentences that provide an initial description of the image. Only output one paragraph with 25 words max. Please follow this exact pattern and do not make up your own. Do not provide explanations."
 
 #Selection of GPT Versions
 def get_gpt_ver():
@@ -119,7 +121,7 @@ def get_user_role():
 	print("1. General AI")
 	print("2. Python Developer")
 	print("3. Web Developer")
-	print("4. AI Image prompt generator")
+	print("4. DALL•E AI Image Generator")
 	print("5. Legal Advisor")
 	print("6. Financial Advisor")
 	print("7. IT Expert")
@@ -141,7 +143,7 @@ def get_user_role():
 		1: "You are a helpful AI ready to assist with multiple tasks",
 		2: python_role,
 		3: html_role,
-		4: "As a guide/prompter for a text-to-image AI, your task is to create a detailed prompt for the provided theme. The 'Prompt: ' should be concise, consisting of 5-10 short sentences that provide an initial description of the image, followed by the 'Keywords: ' , which are 5-10 descriptive adjectives or keywords to add depth and flavour. The 'Negative Words:' are the descriptive adjectives or keywords that you don't want included in the image. For example, if the prompt is 'A mighty dragon with gleaming scales taking flight over towering mountains in a dramatic display of power and grace.', you could add 'A mighty dragon', 'gleaming scales', towering mountains, 'dramatic as a Keywords and 'weak' or 'uninspiring' as a Negative Word, Please follow this exact pattern and do not make up your own",
+		4: image_role,
 		5: "I want you to act as my legal advisor. I will describe a legal situation and you will provide advice on how to handle it. You should only reply with your advice, and nothing else. Do not write explanations",
 		6: "Provide guidance as an expertise on financial markets , incorporating factors such as inflation rate or return estimates along with tracking stock prices over lengthy period ultimately helping user understand sector then suggesting safest possible options available where he/she can allocate funds depending upon their requirement & interests",
 		7: "I want you to act as an IT Expert. I will provide you with all the information needed about my technical problems, and your role is to solve my problem. You should use your computer science, network infrastructure, and IT security knowledge to solve the problem. Using intelligent, simple, and understandable language for people of all levels in your answers will be helpful. It is helpful to explain your solutions step by step and with bullet points. Try to avoid too many technical details, but use them when necessary. Reply with the solution and do not write any explanations",
@@ -529,8 +531,12 @@ def input_py():
 	if not py_files:
 		print("\nNo .py files found in the folder.")
 		voice = "Matthew"
-		asyncio.run(synthesize_text("Python files found in the folder.",voice))
+		asyncio.run(synthesize_text("No python files found in the folder.",voice))
+		return
 	else:
+		print("\nImporting Python file.")
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Importing Python File.",voice))
 		# print the names of the .py files
 		print("\nFollowing python files were found:")
 		voice = "Matthew"
@@ -573,12 +579,16 @@ def input_html():
 	if not py_files:
 		print("\nNo .html files found in the folder.")
 		voice = "Matthew"
-		asyncio.run(synthesize_text("HTML files found in the folder.",voice))
+		asyncio.run(synthesize_text("No HTML files found in the folder.",voice))
+		return
 	else:
-		# print the names of the .py files
-		print("\nPlease select a .html file:")
+		print("\nImporting HTML file.")
 		voice = "Matthew"
-		asyncio.run(synthesize_text("Please select a HTML file.",voice))
+		asyncio.run(synthesize_text("Importing HTML File.",voice))
+		# print the names of the .py files
+		print("\nFollowing html files were found:")
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Following html files were found:",voice))
 		for i, file in enumerate(py_files):
 			print(f"{i+1}: {file}")
 			
@@ -605,6 +615,93 @@ def input_html():
 			# Add the text to the file
 			f.write(html+'\n')
 
+#dali image generation
+def generate_image(prompt):
+	print("\nPrompt generation complete. Generating image.")
+	voice = "Matthew"
+	asyncio.run(synthesize_text("Prompt generation complete. Generating image.",voice))
+	
+	# Prompt the user to select an image size
+	print("\nImage size:")
+	print("1. 256x256")
+	print("2. 512x512")
+	print("3. 1024x1024")
+	
+	while True:
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Please select an image size from options provided.",voice))
+		size_choice = input("\nPlease select an image size from options provided. (1-3): ")
+		if size_choice in ["1", "2", "3"]:
+			break
+		print("\nInvalid choice. Please enter a number between 1 and 3.")
+		
+	# Map the user's choice to an image size string
+	if size_choice == "1":
+		size = "256x256"
+	elif size_choice == "2":
+		size = "512x512"
+	else:
+		size = "1024x1024"
+		
+	# Generate an image using DALL-E
+	try:
+		response = requests.post(
+			"https://api.openai.com/v1/images/generations",
+			headers={"Authorization": f"Bearer {openai.api_key}"},
+			json={
+				"model": "image-alpha-001",
+				"prompt": prompt,
+				"num_images": 1,
+				"size": size
+			}
+		)
+		response.raise_for_status()
+		data = response.json()["data"][0]
+		image_url = data["url"]
+	except requests.exceptions.HTTPError as e:
+		print("HTTP error:", e)
+		return
+	except requests.exceptions.RequestException as e:
+		print("Request error:", e)
+		return
+	except (KeyError, IndexError, ValueError) as e:
+		print("Error parsing API response:", e)
+		return
+	
+	# Download the generated image
+	try:
+		image_response = requests.get(image_url)
+		image_response.raise_for_status()
+		image_data = image_response.content
+	except requests.exceptions.HTTPError as e:
+		print("HTTP error:", e)
+		return
+	except requests.exceptions.RequestException as e:
+		print("Request error:", e)
+		return
+	
+	# Save the image to a file
+	try:
+		with open("output/generated_image.png", "wb") as f:
+			f.write(image_data)
+		print("\nImage generation complete.")
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Image generation complete.",voice))
+	except IOError as e:
+		print("Error writing to file:", e)
+		return
+	
+	# Display the image
+	try:
+		print("\nOpening generated image.")
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Opening generated image.",voice))
+		image = Image.open("output/generated_image.png")
+		image.show()
+	except IOError as e:
+		print("Error opening image file:", e)
+		return
+	
 #chatgpt input and output	
 def gpt(prompt, model, role):
 	try:
@@ -655,6 +752,31 @@ def gpt(prompt, model, role):
 	
 #Check for functions and commands in text	
 def process_input(user_input, model, role):
+	#exit program
+	if user_input == "!shutdown":
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Shutting Down.",voice))
+		print("\nShutting Down.")
+		exit(0)
+		
+	#clearing history
+	if user_input == "!clear":
+		print('Clearing history...')
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Clearing history.",voice))
+		clear()
+		return
+	
+	#resetting program
+	if user_input == "!reset":
+		print('Clearing history...')
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Clearing history.",voice))
+		reset()
+		print('Resetting..\n')
+		asyncio.run(synthesize_text("Reseting.",voice))
+		main()
+		
 	#web scraping with URLs if url is found in text
 	if	contains_url(user_input):
 		url_pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
@@ -678,6 +800,14 @@ def process_input(user_input, model, role):
 		print('\n\n')
 		return
 	
+	if role == image_role:
+		gpt(user_input,model,role)
+		with open('data/activity.txt', 'r') as file:
+			prompt = file.read()# Use the previous role
+			#print("Role: " + activity + "\n")	
+		generate_image(prompt)
+		return
+	
 	#Importing pythong files if 'import python' is found in text
 	if user_input.find('import python') != -1:
 		debug = False
@@ -688,9 +818,6 @@ def process_input(user_input, model, role):
 		if role == python_role:
 			string_without_import = user_input.replace("import python", "")
 			input_py()
-			print("\nImporting Python file.")
-			voice = "Matthew"
-			asyncio.run(synthesize_text("Importing Python File.",voice))
 			gpt(string_without_import,model,role)
 			print('\n\n')
 			if debug:
@@ -719,9 +846,6 @@ def process_input(user_input, model, role):
 		if role == html_role:
 			string_without_import = user_input.replace("import html", "")
 			input_html()
-			print("\nImporting HTML file.")
-			voice = "Matthew"
-			asyncio.run(synthesize_text("Importing HTML File.",voice))
 			gpt(string_without_import,model,role)
 			print('\n\n')
 		else:
@@ -795,31 +919,7 @@ def process_input(user_input, model, role):
 			asyncio.run(synthesize_text("Clipboard is empty. Please copy text to clipboard to use this function.",voice))
 			print("\nClipboard is empty. Please copy text to clipboard to use this function.")
 			return
-	
-	if user_input == "!shutdown":
-		voice = "Matthew"
-		asyncio.run(synthesize_text("Shutting Down.",voice))
-		print("\nShutting Down.")
-		exit(0)
-	
-	#clearing history
-	if user_input == "!clear":
-		print('Clearing history...')
-		voice = "Matthew"
-		asyncio.run(synthesize_text("Clearing history.",voice))
-		clear()
-		return
-	
-	#resetting program
-	if user_input == "!reset":
-		print('Clearing history...')
-		voice = "Matthew"
-		asyncio.run(synthesize_text("Clearing history.",voice))
-		reset()
-		print('Resetting..\n')
-		asyncio.run(synthesize_text("Reseting.",voice))
-		main()
-		
+
 	gpt(user_input,model,role)
 	print('\n\n')
 
