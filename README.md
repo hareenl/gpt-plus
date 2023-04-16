@@ -38,12 +38,17 @@ Additionally, gpt-plus will auto switch to Bing mode if in scenarios where ChatG
 2. Install [git](https://git-scm.com/download/win)
 
 ### Initial Steps - Linux
-```bash
+
 #### Debian-based:
+```bash
 sudo apt install wget git python3 python3-venv
+```
 #### Red Hat-based:
+```bash
 sudo dnf install wget git python3
+```
 #### Arch-based:
+```bash
 sudo pacman -S wget git python3
 ```
 
@@ -65,8 +70,8 @@ cd gpt-plus
 ```
 
 ## Configuration
-Visit https://platform.openai.com/account/api-keys to generate a API Key
-Add API key to .env file (hidden) located in the gpt-plus folder
+Visit [OpenAI](https://platform.openai.com/account/api-keys) to generate an API Key.
+Add API key to .env file (hidden) located in the gpt-plus folder.
 
 #### Example
 ```sh
@@ -96,11 +101,11 @@ AWS_SECRET_ACCESS_KEY=abcdefghijklmnop1234
 ```
 
 ## Start gpt-plus
-###Windows:
+### Windows:
 ```
 run start-gpt.bat
 ```
-###Linux/mac:
+### Linux and mac:
 ```sh
 chmod +x start-gpt.sh
 ./start-gpt.sh
