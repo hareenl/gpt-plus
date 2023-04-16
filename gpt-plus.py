@@ -66,9 +66,13 @@ else:
 	
 #Check if AWS key fields are filled out on .env file. Disable Polly if not completed.		
 if "AWS_ACCESS_KEY_ID" in os.environ and "AWS_SECRET_ACCESS_KEY" in os.environ:
-	os.environ['AWS_ACCESS_KEY_ID']
-	os.environ['AWS_SECRET_ACCESS_KEY']
-	if enable_polly():
+	id = os.environ['AWS_ACCESS_KEY_ID']
+	key = os.environ['AWS_SECRET_ACCESS_KEY']
+	if key == "" or id == "":
+		tts_enable = False
+		print ("\nAWS Access Keys not found. Disabling Text-to-Speech")
+	
+	elif enable_polly():
 		tts_enable = True
 	else:
 		tts_enable = False
