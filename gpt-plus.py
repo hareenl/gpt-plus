@@ -345,7 +345,7 @@ def google(query):
 
 #Checking previous session info and reloading content if requested by user
 def previous_sesh():
-	print("\nWelcome to gpt-plus. This program supports auto switching between ChatGPT and Bing, executing multiple tasks, selection of pre-defined roles, generation of python (.py files), generation of html (.html files), web scraping and google/wikipedia searching. Complete setup and use the following options as required: \n\n\nUse 'tasks' to enter multitask mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'import python' while in python developer role to import python files from input folder.\nUse '--debug' at the end of a prompt or after 'import python' to execute code and debug (in python developer role).\nUse 'import html' to import html while in web developer role to import html files from the input folder.\nUse 'ask gpt' to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from Bing.\nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse '!clear' to clear current history and move to a new topic.\nUse '!reset' to clear history and reset program.\n")
+	print("\nWelcome to gpt-plus. This program supports auto switching between ChatGPT and Bing, executing multiple tasks, selection of pre-defined roles, generation of python (.py files), generation of html (.html files), web scraping and google/wikipedia searching. Complete setup and use the following options as required: \n\n\nUse 'tasks' to enter multitask mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'import python' while in python developer role to import python files from input folder.\nUse '--debug' at the end of a prompt or after 'import python' to execute code and debug (in python developer role).\nUse 'import html' to import html while in web developer role to import html files from the input folder.\nUse 'ask gpt' to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from Bing.\nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse '!clear' to clear current history and move to a new topic.\nUse '!reset' to clear history and reset program.\nUse '!shutdown' to exit program.\n")
 	with open('data/gptver.txt', 'r') as file:
 		gptver = file.read()# Use the previous role
 		#print("Role: " + activity + "\n")	
@@ -777,7 +777,7 @@ def process_input(user_input, model, role):
 			print("\nClipboard is empty. Please copy text to clipboard to use this function.")
 			return
 	
-	if user_input == "shutdown":
+	if user_input == "!shutdown":
 		voice = "Matthew"
 		asyncio.run(synthesize_text("Shutting Down.",voice))
 		print("\nShutting Down.")

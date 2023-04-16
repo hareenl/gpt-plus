@@ -17,9 +17,6 @@ if not pathlib.Path("venv").exists():
     # Install required packages inside virtual environment
     subprocess.run(["pip3", "install", "-r", "requirements.txt"])
 
-    # Deactivate virtual environment
-    subprocess.run(["deactivate"], shell=True)
-
 # Activate virtual environment
 if platform.system() == "Windows":
     activate_script = "venv\\Scripts\\activate.bat"
@@ -30,5 +27,5 @@ subprocess.run(activate_script, shell=True)
 # Run your code
 subprocess.run(["python3", "gpt-plus.py"])
 
-# Deactivate virtual environment
-subprocess.run(["deactivate"], shell=True)
+# Exit virtual environment
+subprocess.run(["exit"], shell=True)

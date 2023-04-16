@@ -28,6 +28,7 @@ Use 'search web' for searching the internet.
 Use 'search wiki' for searching Wikipedia.
 Use '!clear' to clear current history and move to a new topic.
 Use '!reset' to clear history and reset program.
+Use '!shutdown' to exit program.
 ```
 Additionally, gpt-plus will auto switch to Bing mode if in scenarios where ChatGPT is unable to access the latest information.
 
