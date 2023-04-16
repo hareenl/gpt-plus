@@ -19,6 +19,7 @@ import asyncio
 import nest_asyncio
 nest_asyncio.apply()
 
+
 #API key for ChatGPT
 openai.api_key = os.environ["OPENAI_API_KEY"]
 model = "gpt-3.5-turbo"
@@ -30,7 +31,7 @@ engine = 'neural'
 tts_enable = False
 bing_enable = False
 
-#Ask if Polly can be enabled
+#Ask if Polly should be enabled
 def enable_polly():
 	while True:
 		response = input("\nWould you like to enable Text-to-Speech with AWS Polly?:" + " (y/n) ").lower()
@@ -47,13 +48,15 @@ if not openai.api_key:
 	print("\nOpenAI API key is missing. Please add Key to .env file")
 	exit(0)
 
+#check if coookies.json file exists.
 if os.path.isfile('cookies.json'):
 	with open('cookies.json', 'r') as file:
 		bing_cookies = file.read()# Use the previous role
 		bing_cookies = str(bing_cookies)
 else:
 	bing_cookies = ""
-	
+
+#Disable bing if cookies.json file isn't filled out
 if bing_cookies != "":
 	print ("\nConfiguration found in 'cookies.json' file. Enabling Bing functionality.")
 	bing_enable = True
@@ -61,7 +64,7 @@ else:
 	bing_enable = False
 	print ("\nConfiguration not found in 'cookies.json' file. Disabling Bing functionality.")
 	
-		
+#Check if AWS key fields are filled out on .env file. Disable Polly if not completed.		
 if "AWS_ACCESS_KEY_ID" in os.environ and "AWS_SECRET_ACCESS_KEY" in os.environ:
 	os.environ['AWS_ACCESS_KEY_ID']
 	os.environ['AWS_SECRET_ACCESS_KEY']
@@ -73,12 +76,12 @@ else:
 	print ("\nAWS Access Keys not found. Disabling Text-to-Speech")
 	tts_enable = False
 	
-
 	
-	
+#Adding these 2 roles here as they will be called up multiple time later for programming modes.	
 python_role = "I want you to act as a python programming assistant. Output python code for given requests and only output python code. Add comments inside code. Do not provide descriptions outside code. Always place code between <!-- start of Python code --> and <!-- end of Python code -->"
 html_role = "I want you to act as a HTML web developer. Output HTML for given requests and only output HTML. Add comments inside HTML code. Do not provide descriptions outside HTML code. Always place give HTML code between <!-- start of HTML code --> and <!-- end of HTML code -->"
 
+#Selection of GPT Versions
 def get_gpt_ver():
 	print("\nPlease choose one of the following GPT models:")
 	asyncio.run(synthesize_text("Please choose one of the following GPT models:", "Matthew"))
@@ -99,13 +102,13 @@ def get_gpt_ver():
 		1: "gpt-3.5-turbo",
 		2: "gpt-4"
 	}
-	
+	#Write version to txt file
 	with open("data/gptver.txt", "w") as file:
 			# Write some text to the file
 			file.write(ver[choice])
 	return ver[choice]
 			
-			
+#Selection of GPT Roles			
 def get_user_role():
 	print("\nPlease choose one of the following roles:")
 	asyncio.run(synthesize_text("Please choose one of the following roles", "Matthew"))
@@ -143,12 +146,13 @@ def get_user_role():
 		10: "I want you act as a proofreader. I will provide you texts and I would like you to review them for any spelling, grammar, or punctuation errors. Once you have finished reviewing the text, provide me with any necessary corrections or suggestions for improve the text",
 		
 	}
-	
+	#Write role to txt file
 	with open("data/role.txt", "w") as file:
 			# Write some text to the file
 			file.write(roles[choice])
 	return roles[choice]
 
+#Reset all text files
 def reset():
 	with open('data/activity.txt', 'w') as f:
 		# Add the text to the file
@@ -165,7 +169,8 @@ def reset():
 	with open('data/wiki.txt', 'w') as f:
 		# Add the text to the file
 		f.write("")
-		
+
+#Reset only text files related to history
 def clear():
 	with open('data/activity.txt', 'w') as f:
 		# Add the text to the file
@@ -177,8 +182,7 @@ def clear():
 		# Add the text to the file
 		f.write("")
 		
-
-
+#Checking the number of task inputs for multitask mode
 def tasks():
 	# Ask the user to input a quantity of tasks
 	while True:
@@ -196,8 +200,7 @@ def tasks():
 		except ValueError:
 			print("Invalid input. Please enter a number.")
 			
-	
-	
+		
 	# Create an empty list to store the tasks
 	tasks = []
 	counter = 0
@@ -223,7 +226,7 @@ def tasks():
 		tasks.append(task)
 	return tasks
 
-
+#AWS Polly Text to speech and playback of mp3 file
 async def synthesize_text(text, voice):
 	if tts_enable:
 		try:
@@ -249,7 +252,7 @@ async def synthesize_text(text, voice):
 		except Exception as e:
 			print(f'Error: {str(e)}')
 	
-	
+#EdgeGPT bing search using cookies.json
 async def bing(prompt):
 	try:
 		bot = Chatbot(cookiePath='cookies.json')
@@ -279,7 +282,7 @@ async def bing(prompt):
 		print("Error:", str(e))
 		return
 	
-
+#Wikipeadia serach
 def wiki(text):
 	try:
 		# Search for the term "Python"
@@ -306,7 +309,7 @@ def wiki(text):
 		print(f"Error: {e}")
 	return	
 	
-	
+#Google search	
 def google(query):
 	try:
 		results = list(search(query, tld="com", num=10, stop=10, pause=2))
@@ -340,7 +343,7 @@ def google(query):
 		print(f"Error: {e}")
 		return ""
 
-
+#Checking previous session info and reloading content if requested by user
 def previous_sesh():
 	print("\nWelcome to gpt-plus. This program supports auto switching between ChatGPT and Bing, executing multiple tasks, selection of pre-defined roles, generation of python (.py files), generation of html (.html files), web scraping and google/wikipedia searching. Complete setup and use the following options as required: \n\n\nUse 'tasks' to enter multitask mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'import python' while in python developer role to import python files from input folder.\nUse '--debug' at the end of a prompt or after 'import python' to execute code and debug (in python developer role).\nUse 'import html' to import html while in web developer role to import html files from the input folder.\nUse 'ask gpt' to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from Bing.\nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse '!clear' to clear current history and move to a new topic.\nUse '!reset' to clear history and reset program.\n")
 	with open('data/gptver.txt', 'r') as file:
@@ -363,17 +366,17 @@ def previous_sesh():
 	else:
 		return False
 
-
+#check for URL
 def contains_url(text):
 	url_pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 	return bool(url_pattern.search(text))
 
-
+#Remove URL from text
 def remove_url(text):
 	url_pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 	return url_pattern.sub('', text)
 
-
+#Web scraping with BS4
 def scrape_web(url):
 	try:
 		response = requests.get(url)
@@ -404,7 +407,7 @@ def scrape_web(url):
 	except requests.exceptions.ConnectionError as e:
 		print("Error: ", e)				
 
-
+#Python file testing and debugging
 def test_py():
 	voice = "Matthew"
 	print ("\nExecuting code and error checking.")
@@ -445,8 +448,7 @@ def test_py():
 		asyncio.run(synthesize_text("Debugging successfully completed. Code has been verified.",voice))
 		return
 	
-		
-	
+#Saving python text generated to a python file
 def save_py():
 	try:
 		# Read the text file
@@ -471,7 +473,7 @@ def save_py():
 	except Exception as e:
 		print(f"An error occurred while processing the file: {e}")
 
-
+#saving html text generated to a html file
 def save_html():
 	try:
 		# Read the text file
@@ -496,7 +498,7 @@ def save_html():
 	except Exception as e:
 		print(f"An error occurred while processing the file: {e}")
 
-	
+#selection of python files from the input folder	
 def input_py():
 	# set the folder path
 	folder_path = "input"
@@ -540,7 +542,7 @@ def input_py():
 			# Add the text to the file
 			f.write(python+'\n')
 		
-
+#selection of html files from the html folder
 def input_html():
 	# set the folder path
 	folder_path = "input"
@@ -584,7 +586,7 @@ def input_html():
 			# Add the text to the file
 			f.write(html+'\n')
 
-	
+#chatgpt input and output	
 def gpt(prompt, model, role):
 	try:
 		with open('data/activity.txt', 'r') as file:
@@ -632,8 +634,9 @@ def gpt(prompt, model, role):
 		print("Error asking ChatGPT:", str(e))
 		return
 	
-	
+#Check for functions and commands in text	
 def process_input(user_input, model, role):
+	#web scraping with URLs if url is found in text
 	if	contains_url(user_input):
 		url_pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
 		url = url_pattern.findall(user_input)
@@ -648,15 +651,18 @@ def process_input(user_input, model, role):
 			user_input = webtxt
 		else:
 			user_input = nourl + " " + webtxt
-			
+	
+	#Switching to GPT mode. Will not auto switch to bing
 	if user_input.find('ask gpt') != -1:
 		string_without_askgpt = user_input.replace("ask gpt", "")
 		gpt(string_without_askgpt,model,role)
 		print('\n\n')
 		return
 	
+	#Importing pythong files if 'import python' is found in text
 	if user_input.find('import python') != -1:
 		debug = False
+		#looking for debug option
 		if user_input.find('--debug') !=-1:
 			user_input = user_input.replace("--debug", "")
 			debug = True
@@ -675,7 +681,8 @@ def process_input(user_input, model, role):
 			voice = "Matthew"
 			asyncio.run(synthesize_text("Please switch to Role 2: Python Developer to use this function.",voice))
 		return
-
+	
+	#Debugging python files if command is found in text
 	if user_input.find('--debug') !=-1:
 		if role == python_role:
 			string_without_errorchk = user_input.replace("--debug", "")
@@ -688,6 +695,7 @@ def process_input(user_input, model, role):
 			asyncio.run(synthesize_text("Please switch to Role 2: Python Developer to use this function.",voice))
 		return
 	
+	#importing html files if 'import html' is found in text
 	if user_input.find('import html') != -1:
 		if role == html_role:
 			string_without_import = user_input.replace("import html", "")
@@ -702,7 +710,8 @@ def process_input(user_input, model, role):
 			voice = "Matthew"
 			asyncio.run(synthesize_text("Please switch to Role 3: Web Developer to use this function.",voice))
 		return
-		
+	
+	#switch to bing when latest info is requested. Will ignore this functionality if and of the 2 dev roles are bein utilised
 	if role != html_role and role != python_role:
 		if bing_enable and user_input.find('weather') != -1 or user_input.find('news') != -1 or user_input.find('price') != -1 or user_input.find('stock') != -1 or user_input.find('latest') != -1 or user_input.find('current') != -1:
 			voice = "Matthew"
@@ -712,7 +721,7 @@ def process_input(user_input, model, role):
 			asyncio.run(bing(bing_input))
 			return 
 	
-	
+	#switching to bing mode if 'ask bing' is present in text
 	if user_input.find('ask bing') != -1:
 		if bing_enable:
 			string_without_askbing = user_input.replace("ask bing", "") + ". Do not ask any questions after responding."
@@ -727,6 +736,7 @@ def process_input(user_input, model, role):
 			asyncio.run(synthesize_text("Please setup cookies.json file to access Bing functionality.",voice))
 			return 
 	
+	#Wikipedia search if 'search wiki' is present in text
 	if user_input.find('search wiki') != -1:
 		voice = "Matthew"
 		asyncio.run(synthesize_text("Searching Wikipedia.",voice))
@@ -738,6 +748,7 @@ def process_input(user_input, model, role):
 			#print("Role: " + activity + "\n")
 		user_input = "summarise" + wikiout
 		
+	#search google is 'search web' is present
 	if user_input.find('search web') != -1:
 		voice = "Matthew"
 		asyncio.run(synthesize_text("Searching Google.",voice))
@@ -751,6 +762,7 @@ def process_input(user_input, model, role):
 			#print("Role: " + activity + "\n")	
 		user_input = "summarise" + webtxt
 	
+	#Read clipboard using pyperclip module if 'read clipboard' is present in text
 	if user_input.find('read clipboard') != -1:
 		voice = "Matthew"
 		asyncio.run(synthesize_text("Extracting text from clipboard.",voice))
@@ -758,20 +770,28 @@ def process_input(user_input, model, role):
 		text = pyperclip.paste()
 		string_without_clip = user_input.replace("read clipboard", "")
 		user_input = string_without_clip + text
+		#If no text found in clipboard
+		if user_input == "":
+			voice = "Matthew"
+			asyncio.run(synthesize_text("Clipboard is empty. Please copy text to clipboard to use this function.",voice))
+			print("\nClipboard is empty. Please copy text to clipboard to use this function.")
+			return
 	
 	if user_input == "shutdown":
 		voice = "Matthew"
 		asyncio.run(synthesize_text("Shutting Down.",voice))
 		print("\nShutting Down.")
 		exit(0)
-		
+	
+	#clearing history
 	if user_input == "!clear":
 		print('Clearing history...')
 		voice = "Matthew"
 		asyncio.run(synthesize_text("Clearing history.",voice))
 		clear()
 		return
-		
+	
+	#resetting program
 	if user_input == "!reset":
 		print('Clearing history...')
 		voice = "Matthew"
@@ -786,7 +806,7 @@ def process_input(user_input, model, role):
 
 	
 def main():
-	
+	#check for previous session, else request model and role input
 	if previous_sesh():
 		with open('data/gptver.txt', 'r') as file:
 			model = file.read()# Use the previous role
@@ -797,13 +817,15 @@ def main():
 	else:		
 		model = get_gpt_ver()
 		role = get_user_role()	
-			
+		
+	#Initial GPT description		
 	gpt("Explain your role in 25 words",model,role)
 	
 	while True:
+		#Request user input
 		user_input = input("\nInput: ")
 		
-		
+		#Enter tasks mode and request for task input for number entered by user
 		if user_input == "tasks":
 			tasklist  = []
 			tasklist = tasks()
@@ -820,5 +842,8 @@ def main():
 			
 				
 		else:
+			#If not  in taskmode, run the general check for commands and functions in input
 			process_input(user_input, model, role)
+
+#run main
 main()

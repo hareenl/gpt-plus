@@ -1,43 +1,55 @@
 import requests
 import json
+import base64
 
-# Replace YOUR_API_KEY with your own OpenAI API key
-api_key = 'YOUR_API_KEY'
+#Enter your OpenAI API key
+api_key = "ENTER_YOUR_API_KEY_HERE"
 
-# Set the API endpoint URL
-url = 'https://api.openai.com/v1/images/generations'
+#Create headers dictionary with API key for authorization
+headers = {
+    'Authorization': 'Bearer {}'.format(api_key)
+}
 
-# Set the prompt for generating the image
-prompt = "an armchair in the shape of an avocado"
+#Enter the prompt for the image you want to generate
+prompt = "a cat sitting on a cloud above the city at night"
 
-# Set the model to use. You can use either "image-alpha-001" or "image-beta-001"
+#Enter the model you want to use (e.g. 'image-alpha-001' or 'image-beta-001')
 model = "image-alpha-001"
 
-# Set the response format to JSON
-headers = {'Content-Type': 'application/json',
-           'Authorization': f'Bearer {api_key}'}
+#Enter the number of images you want generated (maximum is 10)
+num_images = 1
 
-# Set the request payload
+#Enter the size of the image you want generated (e.g. '256x256', '512x512', or '1024x1024')
+size = "512x512"
+
+#Create data dictionary with prompt, model, number of images, and size
 data = {
-    'model': model,
-    'prompt': prompt,
-    'num_images': 1,  # Set the number of images to generate
-    'size': '1024x1024',  # Set the size of the final image
-    'response_format': 'url'  # Set the response format to URL
+    "text": prompt,
+    "model": model,
+    "num_images": num_images,
+    "size": size
 }
 
 try:
-    # Send the API request
-    response = requests.post(url, headers=headers, data=json.dumps(data))
+    #Send POST request to DALL·E API endpoint with data and headers
+    response = requests.post('https://api.openai.com/v1/images/generations', json=data, headers=headers)
 
-    # Get the response URL
-    json_response = response.json()
-    
-    if 'data' in json_response:
-        image_url = json_response['data'][0]['url']
-        print(f"DALL·E generated image URL: {image_url}")
-    else:
-        print("An error has occurred. Please try again later.")
+    #Decode image data from response
+    response_data = json.loads(response.text)
+
+    #If there is no data in the response dictionary
+    if 'data' not in response_data:
+        raise ValueError('Response did not contain any data.')
+        
+    #Get image URL
+    image_url = response_data['data'][0]['url']
+
+    #Decode image data from response
+    image_binary = base64.b64decode(image_url.split(",")[1])
+
+    #Save image to file
+    with open("dalle_image.png", "wb") as f:
+        f.write(image_binary)
         
 except Exception as e:
-    print(f"An error has occurred: {e}")
+    print('An error occurred:', e)

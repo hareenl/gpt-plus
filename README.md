@@ -33,8 +33,31 @@ Additionally, gpt-plus will auto switch to Bing mode if in scenarios where ChatG
 
 
 ## Installation
-Download gpt-plus and install dependencies.
+### Initial Steps - Windows
+1. Install [Python 3.10.10](https://www.python.org/downloads/release/python-31010/), checking "Add Python to PATH".
+2. Install [git](https://git-scm.com/download/win)
 
+### Initial Steps - Linux
+```bash
+#### Debian-based:
+sudo apt install wget git python3 python3-venv
+#### Red Hat-based:
+sudo dnf install wget git python3
+#### Arch-based:
+sudo pacman -S wget git python3
+```
+
+### Initial Steps - Mac
+Install [brew](https://brew.sh/)
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+Install python and git
+```bash
+brew install python@3.10 git
+```
+## gpt-plus setup
+Once above steps are completed download gpt-plus and install dependencies using following commands.
 ```sh
 git clone https://github.com/hareenl/gpt-plus.git
 cd gpt-plus
@@ -73,9 +96,14 @@ AWS_SECRET_ACCESS_KEY=abcdefghijklmnop1234
 ```
 
 ## Start gpt-plus
-
+###Windows:
+```
+run start-gpt.bat
+```
+###Linux/mac:
 ```sh
-python3 gpt-plus.py
+chmod +x start-gpt.sh
+./start-gpt.sh
 ```
 ## Advanced prompt Examples
 
