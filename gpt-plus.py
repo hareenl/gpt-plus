@@ -444,7 +444,22 @@ def test_py():
 			asyncio.run(synthesize_text("Errors found. Applying fixes.",voice))
 		gpt("",model,role)
 		print('\n\n')
-		test_py()
+		print('')
+		while True:
+			asyncio.run(synthesize_text("Do you want debug the updated code?",voice))
+			user_input = input("\nDo you want debug the updated code (y/n)? ")
+			if user_input.lower() == "y":
+				# Do something to continue
+				test_py()
+				break
+			elif user_input.lower() == "n":
+				# Do something to return
+				print ("\nExiting debug mode.")
+				asyncio.run(synthesize_text("Exiting debug mode.",voice))
+				return
+				break
+			else:
+				print("Invalid input. Please enter 'y' to continue or 'n' to return.")
 	elif "Exception" in output:
 		print(f"\nException occurred: {output_str}")
 	else:
