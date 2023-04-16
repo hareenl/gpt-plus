@@ -72,7 +72,8 @@ cd gpt-plus
 
 ## Configuration
 Visit [OpenAI](https://platform.openai.com/account/api-keys) to generate an API Key.
-Add API key to .env file (hidden) located in the gpt-plus folder.
+Add API key to .env file (hidden) located in the gpt-plus folder. 
+Open and edit the files in terminal or by navigating to the directory in file browser.
 
 #### Example
 ```sh
@@ -104,7 +105,7 @@ AWS_SECRET_ACCESS_KEY=abcdefghijklmnop1234
 ## Start gpt-plus
 #### Windows:
 ```
-run start-gpt.bat
+start-gpt.bat
 ```
 #### Linux and mac:
 ```sh
