@@ -75,8 +75,9 @@ cd gpt-plus
 ### ChatGPT API
 Add ChatGPT functionality by following the steps below:
 - Visit [OpenAI](https://platform.openai.com/account/api-keys) to generate an API Key.
+- Navigate to the gpt-plus directory in terminal or file browser.
 - Rename the .env.template file located in gpt-plus folder to .env and add API key to the file. 
-- Open and edit the files in terminal or by navigating to the directory in file browser.
+
 
 #### Example
 ```sh
