@@ -73,9 +73,9 @@ cd gpt-plus
 
 ## Configuration
 ### ChatGPT API
-Add ChatGPT functionality by following the steps below.
+Add ChatGPT functionality by following the steps below:
 - Visit [OpenAI](https://platform.openai.com/account/api-keys) to generate an API Key.
-- Rename the .env.template file to .env and add API key to .env file (hidden) located in the gpt-plus folder. 
+- Rename the .env.template file located in gpt-plus folder to .env and add API key to the file. 
 - Open and edit the files in terminal or by navigating to the directory in file browser.
 
 #### Example
@@ -95,7 +95,7 @@ To add Bing functionality to gpt-plus, steps are as follows:
 Read additional details on [EdgeGPT](https://github.com/acheong08/EdgeGPT)
 
 ### Optional Step - AWS Polly
-Add AWS Polly support for Text-to-Speech by filling in the AWS Access and Secret keys in the .env file.
+Add AWS Polly support for Text-to-Speech by filling in the [AWS Access and Secret keys](https://aws.amazon.com/blogs/security/wheres-my-secret-access-key/) in the .env file.
 If this step is completed, the console will provide an option to enable Text-to-Speech when initialised.
 
 #### Example
