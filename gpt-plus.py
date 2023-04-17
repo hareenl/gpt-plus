@@ -434,7 +434,7 @@ def test_py():
 	if errors != "":
 		print (f"\nError: {errors}")
 		text = python + "\n" + "the code above generated this error: " + errors + "Fix code and add error handling."
-		if errors.find("No module named '"):
+		if errors.find("No module named '") != -1:
 			pattern = r"No module named '(\w+)'"
 			match = re.search(pattern, text)
 			if match:
@@ -469,21 +469,21 @@ def test_py():
 			gpt("",model,role)
 			print('\n\n')
 			print('')
-		while True:
-			asyncio.run(synthesize_text("Do you want debug the updated code?",voice))
-			user_input = input("\nDo you want debug the updated code (y/n)? ")
-			if user_input.lower() == "y":
-				# Do something to continue
-				test_py()
-				break
-			elif user_input.lower() == "n":
-				# Do something to return
-				print ("\nExiting debug mode.")
-				asyncio.run(synthesize_text("Exiting debug mode.",voice))
-				return
-				break
-			else:
-				print("Invalid input. Please enter 'y' to continue or 'n' to return.")
+			while True:
+				asyncio.run(synthesize_text("Would you like to debug the updated code?",voice))
+				user_input = input("\nWould you like to debug the updated code (y/n)? ")
+				if user_input.lower() == "y":
+					# Do something to continue
+					test_py()
+					break
+				elif user_input.lower() == "n":
+					# Do something to return
+					print ("\nExiting debug mode.")
+					asyncio.run(synthesize_text("Exiting debug mode.",voice))
+					return
+					break
+				else:
+					print("Invalid input. Please enter 'y' to continue or 'n' to return.")
 	elif "Exception" in output:
 		print(f"\nException occurred: {output_str}")
 	else:
