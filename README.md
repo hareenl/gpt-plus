@@ -7,7 +7,7 @@
 - Automatic switching between ChatGPT and Bing depending on request.
 - Multitask mode to execute as many tasks as required with access to information acquired from a prior task.
 - Multi-step Python code generation and creation of .py file as output'.
-- Execute and debug option for Python code.
+- Execute and debug option for Python code. Supports automatic installation of missing modules.
 - Multi-step HTML code generation and creation of .html file as output'.
 - Generation of images utilising ChatGPT and DALL•E API.
 - Options for switching between gpt-3.5-turbo and gpt-4.
@@ -21,7 +21,7 @@ Use the following options in gpt-plus for additional functionality:
 Use 'tasks' to enter multitask mode.
 Use 'read clipboard' to access text from clipboard.
 Use 'import python' while in python developer role to import python files from input folder.
-Use '--debug' at the end of a prompt or after 'import python' to execute code, install missing modules and debug (in python developer role).
+Use '--debug' at the end of a prompt or after 'import python' to execute code and debug (in python developer role).
 Use 'import html' to import html while in web developer role to import html files from the input folder.
 Use 'ask gpt' to request response specifically from ChatGPT.
 Use 'ask bing' to request response specifically from Bing.
