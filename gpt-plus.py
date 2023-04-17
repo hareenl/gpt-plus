@@ -83,7 +83,7 @@ else:
 	
 	
 #Adding these 2 roles here as they will be called up multiple time later for programming modes.	
-python_role = "I want you to act as a python programming assistant. Output python code for given requests and only output python code. Add comments inside code. Do not provide descriptions outside code. Always place code between <!-- start of Python code --> and <!-- end of Python code -->"
+python_role = "I want you to act as a python programming assistant. Output python code for given requests and only output python code. Add comments inside code. Include any modules which need be installed as a comment inside python code. For Example #pip install openai. Do not provide descriptions outside code. Always place code between <!-- start of Python code --> and <!-- end of Python code -->"
 html_role = "I want you to act as a HTML web developer. Output HTML for given requests and only output HTML. Add comments inside HTML code. Do not provide descriptions outside HTML code. Always place give HTML code between <!-- start of HTML code --> and <!-- end of HTML code -->"
 image_role = "I want you to generate a prompt for a text-to-image AI. your task is to create a detailed prompt for the provided theme. The prompt should be concise paragraph consisting of a few short sentences that provide an initial description of the image. Only output one paragraph with 25 words max. Please follow this exact pattern and do not make up your own. Do not provide explanations."
 
@@ -434,19 +434,41 @@ def test_py():
 	if errors != "":
 		print (f"\nError: {errors}")
 		text = python + "\n" + "the code above generated this error: " + errors + "Fix code and add error handling."
-		with open('data/activity.txt', 'w') as file:
-			file.write(text)
-		with open('data/gptver.txt', 'r') as file:
-			model = file.read()# Use the previous role
-			#print("Role: " + activity + "\n")	
-		with open('data/role.txt', 'r') as file:
-			role = file.read()# Use the previous role
-			#print("Role: " + activity + "\n")
-			print ("\nErrors found. Applying fixes.")
+		if errors.find("No module named '"):
+			pattern = r"No module named '(\w+)'"
+			match = re.search(pattern, text)
+			if match:
+				module_text = match.group(1)
+				print(module_text)
+				try:
+					print (f"\nFound missing module: '{module_text}'")
+					asyncio.run(synthesize_text(f"Found missing module: {module_text}.", voice))
+					print (f"\nInstalling missing module: '{module_text}'\n")
+					asyncio.run(synthesize_text(f"Installing missing module: {module_text}.", voice))
+					# Use pip to install Pygame module
+					subprocess.check_call(['pip3', 'install', module_text])
+					print(f"\nModule {module_text} installed successfully!")
+					asyncio.run(synthesize_text(f"Module {module_text} installed successfully!", voice))
+				except subprocess.CalledProcessError as e:
+					print(f"Error while installing module: {e}")
+				except Exception as e:
+					print(f"Unknown error: {e}")
+			else:
+				pass
+		else:		
+			with open('data/activity.txt', 'w') as file:
+				file.write(text)
+			with open('data/gptver.txt', 'r') as file:
+				model = file.read()# Use the previous role
+				#print("Role: " + activity + "\n")	
+			with open('data/role.txt', 'r') as file:
+				role = file.read()# Use the previous role
+				#print("Role: " + activity + "\n")
+				print ("\nErrors found. Applying fixes.")
 			asyncio.run(synthesize_text("Errors found. Applying fixes.",voice))
-		gpt("",model,role)
-		print('\n\n')
-		print('')
+			gpt("",model,role)
+			print('\n\n')
+			print('')
 		while True:
 			asyncio.run(synthesize_text("Do you want debug the updated code?",voice))
 			user_input = input("\nDo you want debug the updated code (y/n)? ")
