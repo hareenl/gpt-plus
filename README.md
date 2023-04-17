@@ -72,9 +72,11 @@ cd gpt-plus
 ```
 
 ## Configuration
-Visit [OpenAI](https://platform.openai.com/account/api-keys) to generate an API Key.
-Add API key to .env file (hidden) located in the gpt-plus folder. 
-Open and edit the files in terminal or by navigating to the directory in file browser.
+### ChatGPT API
+Add ChatGPT functionality by following the steps below.
+- Visit [OpenAI](https://platform.openai.com/account/api-keys) to generate an API Key.
+- Rename the .env.template file to .env and add API key to .env file (hidden) located in the gpt-plus folder. 
+- Open and edit the files in terminal or by navigating to the directory in file browser.
 
 #### Example
 ```sh
@@ -87,7 +89,8 @@ To add Bing functionality to gpt-plus, steps are as follows:
 - Go to bing.com (Login to page)
 - Open the extension
 - Click "Export" on the bottom right, then "Export as JSON" (This saves your cookies to clipboard)
-- Paste your cookies into a file cookies.json located in gpt-plus
+- Rename cookies.json.template file in gpt-plus folder to cookies.json
+- Paste your cookies into a file cookies.json
 
 Read additional details on [EdgeGPT](https://github.com/acheong08/EdgeGPT)
 

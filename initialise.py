@@ -1,31 +1,36 @@
 import subprocess
 import platform
-import pathlib
+import sys
+import os
 
-# Check if virtual environment exists
-if not pathlib.Path("venv").exists():
-    # Create virtual environment
-    subprocess.run(["python3", "-m", "venv", "venv"])
+try:
+    # command to run Python environment
+    command = "python3 -m venv venv"
 
-    # Activate virtual environment
-    if platform.system() == "Windows":
+    # execute the command
+    subprocess.run(command, shell=True, check=True)
+
+    # activate the environment
+    system = platform.system()
+    if system == "Windows":
         activate_script = "venv\\Scripts\\activate.bat"
-    else:
+    elif system == "Linux" or system == "Darwin":
         activate_script = "source venv/bin/activate"
-    subprocess.run(activate_script, shell=True)
+    subprocess.run(activate_script, shell=True, check=True)
 
-    # Install required packages inside virtual environment
-    subprocess.run(["pip3", "install", "-r", "requirements.txt"])
+    # check if requirements are already installed
+    reqs = subprocess.check_output(['pip3', 'freeze']).decode('utf-8')
+    with open('requirements.txt', 'r') as f:
+        requirements = f.read()
+    if requirements not in reqs:
+        # install the requirements
+        subprocess.run("pip3 install -r requirements.txt", shell=True, check=True)
 
-# Activate virtual environment
-if platform.system() == "Windows":
-    activate_script = "venv\\Scripts\\activate.bat"
-else:
-    activate_script = "source venv/bin/activate"
-subprocess.run(activate_script, shell=True)
+    # run the gpt-plus.py script
+    subprocess.run("python3 gpt-plus.py", shell=True, check=True)
 
-# Run your code
-subprocess.run(["python3", "gpt-plus.py"])
+    # Exit virtual environment
+    subprocess.run(["exit"], shell=True, check=True)
 
-# Exit virtual environment
-subprocess.run(["exit"], shell=True)
+except subprocess.CalledProcessError as e:
+    print(f"An error occurred: {e}")
