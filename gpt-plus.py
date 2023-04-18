@@ -423,6 +423,8 @@ def test_py():
 		python = file.read()# Use the previous role
 		#print("Role: " + activity + "\n")
 	
+	print ("\nPress 'Enter' if the code contains user input fields.")
+	
 	file = 'output/generated_code.py'
 	# Replace 'external_file.py' with the name of your external Python file
 	process = subprocess.Popen(['python3', file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -449,6 +451,7 @@ def test_py():
 					subprocess.check_call(['pip3', 'install', module_text])
 					print(f"\nModule {module_text} installed successfully!")
 					asyncio.run(synthesize_text(f"Module {module_text} installed successfully!", voice))
+					test_py()
 				except subprocess.CalledProcessError as e:
 					print(f"Error while installing module: {e}")
 				except Exception as e:
