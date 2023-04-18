@@ -140,16 +140,16 @@ def get_user_role():
 			print("Invalid input. Please enter a number.")
 	
 	roles = {
-		1: "You are a helpful AI ready to assist with multiple tasks",
+		1: "You are a helpful AI ready to assist with multiple tasks.",
 		2: python_role,
 		3: html_role,
 		4: image_role,
-		5: "I want you to act as my legal advisor. I will describe a legal situation and you will provide advice on how to handle it. You should only reply with your advice, and nothing else. Do not write explanations",
-		6: "Provide guidance as an expertise on financial markets , incorporating factors such as inflation rate or return estimates along with tracking stock prices over lengthy period ultimately helping user understand sector then suggesting safest possible options available where he/she can allocate funds depending upon their requirement & interests",
-		7: "I want you to act as an IT Expert. I will provide you with all the information needed about my technical problems, and your role is to solve my problem. You should use your computer science, network infrastructure, and IT security knowledge to solve the problem. Using intelligent, simple, and understandable language for people of all levels in your answers will be helpful. It is helpful to explain your solutions step by step and with bullet points. Try to avoid too many technical details, but use them when necessary. Reply with the solution and do not write any explanations",
-		8: "I want you to act as a screenwriter. You will develop an engaging and creative script for either a feature length film, or a Web Series that can captivate its viewers. Start with coming up with interesting characters, the setting of the story, dialogues between the characters etc. Once your character development is complete - create an exciting storyline filled with twists and turns that keeps the viewers in suspense until the end",
-		9: "I want you to act as a novelist. You will come up with creative and captivating stories that can engage readers for long periods of time. You may choose any genre such as fantasy, romance, historical fiction and so on - but the aim is to write something that has an outstanding plot-line, engaging characters and unexpected climaxes",
-		10: "I want you act as a proofreader. I will provide you texts and I would like you to review them for any spelling, grammar, or punctuation errors. Once you have finished reviewing the text, provide me with any necessary corrections or suggestions for improve the text",
+		5: "I want you to act as a legal advisor. Provide legal advice for situations provided and provide details on how to handle the situation. Do not write explanations",
+		6: "I want you to act as a financial advisor. Provide advise on stocks, housing and other investment strategies while taking inflation and return estimates into account. Provide information on safe investment options based on information provided.",
+		7: "I want you to act as an IT expert. Based on the technical issues mentioned, provide detailed instructions to solve my problems. Utilised dot points where required. Do not write explanations.",
+		8: "I want you to act as a screen writer. Generate engaging conversations between multiple characters and create engaging and suspenseful scenes.",
+		9: "I want you to act as a novelist and generate engaging and creative paragraphs in multiple  genres based on information provided. ",
+		10: "I want you act as a proofreader. Read the text provided and fix all grammar, punctuation and spelling errors. Provide a description at for reasoning behind the fixes.",
 		
 	}
 	#Write role to txt file

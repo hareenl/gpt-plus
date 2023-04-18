@@ -216,4 +216,3 @@ except:
 
 ## Credits
 - [EdgeGPT (Bing)](https://github.com/acheong08/EdgeGPT)
-- [Prompthero (ChatGPT Prompts)](https://prompthero.com/chatgpt-prompts)
