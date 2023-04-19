@@ -118,6 +118,11 @@ chmod +x start-gpt.sh
 ./start-gpt.sh
 ```
 ## Advanced prompt Examples
+#### General AI role
+Following prompt will import text from clipboard and summarise text.
+```
+read clipboard and summarise in 100 words
+```
 
 #### Python Developer role
 Following prompt will generate code, save the code to 'output/generated_code.py', execute code and debug. If errors are found they will be fixed and the debugging process will repeat till the code is error free.

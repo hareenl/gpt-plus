@@ -7,7 +7,6 @@ python-dotenv==1.0.0
 wikipedia==1.4.0
 pyperclip==1.8.2
 EdgeGPT==0.1.22.1
-rollbar==0.16.3
 boto3==1.26.111
 playsound==1.2.2
 nest-asyncio==1.5.6

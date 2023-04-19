@@ -5,7 +5,6 @@ import openai
 import requests
 import wikipedia
 import pyperclip
-import rollbar
 import boto3
 import glob
 import subprocess
@@ -56,7 +55,31 @@ if os.path.isfile('cookies.json'):
 		bing_cookies = str(bing_cookies)
 else:
 	bing_cookies = ""
+	
 
+#Create storage found if not found	
+if not os.path.isfile('data/activity.txt'):
+	with open('data/activity.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")
+if not os.path.isfile('data/gptver.txt'):		
+	with open('data/gptver.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")
+if not os.path.isfile('data/role.txt'):
+	with open('data/role.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")
+if not os.path.isfile('data/web.txt'):
+	with open('data/web.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")
+if not os.path.isfile('data/wiki.txt'):
+	with open('data/wiki.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")	
+		
+		
 #Disable bing if cookies.json file isn't filled out
 if bing_cookies != "":
 	print ("\nConfiguration found in 'cookies.json' file. Enabling Bing functionality.")
@@ -81,7 +104,7 @@ else:
 	print ("\nAWS Access Keys not found. Disabling Text-to-Speech")
 	tts_enable = False
 	
-	
+
 #Adding these 2 roles here as they will be called up multiple time later for programming modes.	
 python_role = "I want you to act as a python programming assistant. Output python code for given requests and only output python code. Add comments inside code. Include any modules which need be installed as a comment inside python code. For Example #pip install openai. Do not provide descriptions outside code. Always place code between <!-- start of Python code --> and <!-- end of Python code -->"
 html_role = "I want you to act as a HTML web developer. Output HTML for given requests and only output HTML. Add comments inside HTML code. Do not provide descriptions outside HTML code. Always place give HTML code between <!-- start of HTML code --> and <!-- end of HTML code -->"
@@ -419,9 +442,14 @@ def test_py():
 	print ("\nExecuting code and error checking.")
 	asyncio.run(synthesize_text("Executing code and error checking.",voice))
 	
-	with open('output/generated_code.py', 'r') as file:
-		python = file.read()# Use the previous role
-		#print("Role: " + activity + "\n")
+	if os.path.isfile('output/generated_code.py'):
+		with open('output/generated_code.py', 'r') as file:
+			python = file.read()# Use the previous role
+			#print("Role: " + activity + "\n")
+	else:
+		print ("\ngenerated_code.py file not found in output folder. Generate or import a python code prior to use of --debug function.")
+		asyncio.run(synthesize_text("generated_code python file not found in output folder. Generate or import a python code prior to use of debug function.",voice))
+		return
 	
 	print ("\nPress 'Enter' if the code contains user input fields.")
 	
@@ -771,7 +799,6 @@ def gpt(prompt, model, role):
 		return
 	
 	except Exception as e:
-		rollbar.report_exc_info()
 		print("Error asking ChatGPT:", str(e))
 		return
 	
