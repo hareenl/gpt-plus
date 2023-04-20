@@ -8,6 +8,7 @@ import pyperclip
 import boto3
 import glob
 import subprocess
+import platform
 from PIL import Image
 from EdgeGPT import Chatbot, ConversationStyle
 from googlesearch import search
@@ -454,8 +455,13 @@ def test_py():
 	print ("\nPress 'Enter' if the code contains user input fields.")
 	
 	file = 'output/generated_code.py'
-	# Replace 'external_file.py' with the name of your external Python file
-	process = subprocess.Popen(['python3', file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	
+	system = platform.system()
+	if system == "Windows":
+		process = subprocess.Popen(['python', file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	elif system == "Linux" or system == "Darwin":
+		process = subprocess.Popen(['python3', file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	
 	
 	output, errors = process.communicate()
 	# Decode bytes to strings
@@ -504,11 +510,11 @@ def test_py():
 				asyncio.run(synthesize_text("Would you like to debug the updated code?",voice))
 				user_input = input("\nWould you like to debug the updated code (y/n)? ")
 				if user_input.lower() == "y":
-					# Do something to continue
+					# Run debugging
 					test_py()
 					break
 				elif user_input.lower() == "n":
-					# Do something to return
+					# Exit Debug mode
 					print ("\nExiting debug mode.")
 					asyncio.run(synthesize_text("Exiting debug mode.",voice))
 					return
@@ -610,7 +616,7 @@ def input_py():
 		# get the selected file name
 		selected_file_name = py_files[int(selected_file_index) - 1]
 		
-		# do something with the selected file
+		# print selected file
 		print(f"\nYou selected file: {selected_file_name}")
 		# Read the text file
 		with open(f"{selected_file_name}", 'r') as file:
@@ -658,7 +664,7 @@ def input_html():
 		# get the selected file name
 		selected_file_name = py_files[int(selected_file_index) - 1]
 		
-		# do something with the selected file
+		# print selected file
 		print(f"\nYou selected file: {selected_file_name}")
 		# Read the text file
 		with open(f"{selected_file_name}", 'r') as file:

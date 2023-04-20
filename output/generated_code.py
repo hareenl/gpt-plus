@@ -1,2 +1,5 @@
-# There is no actual code to write to create a blank python file.
-# You can create a blank python file by simply creating a new file with a .py extension without writing any python code.
+# Here's an example code for printing "Hello, World!" in Python:
+
+print("Hello, World!")
+
+# The above code uses the print function in Python to output the string "Hello, World!" to the console.
