@@ -852,8 +852,8 @@ def process_input(user_input, model, role):
 		user_input = user_input.replace("!recall", "")
 		history = True
 		voice = "Matthew"
-		asyncio.run(synthesize_text("Enabling recall mode.",voice))
-		print("\nEnabling recall mode.")
+		asyncio.run(synthesize_text("Recalling information from conversation history.",voice))
+		print("\nRecalling information from conversation history.")
 		
 	#exit program
 	if user_input == "!shutdown":
