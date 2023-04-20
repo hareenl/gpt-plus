@@ -124,7 +124,7 @@ Following prompt will import text from clipboard and summarise text.
 ```
 read clipboard and summarise in 100 words
 ```
-Following prompt will recall full session history and allow recalling events.
+The following prompt will recall the full session history and allow recalling of events.
 ```
 !recall weather in melbourne on saturday
 ```
