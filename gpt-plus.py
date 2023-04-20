@@ -52,7 +52,7 @@ if not openai.api_key:
 #check if coookies.json file exists.
 if os.path.isfile('cookies.json'):
 	with open('cookies.json', 'r') as file:
-		bing_cookies = file.read()# Use the previous role
+		bing_cookies = file.read()# read cookies.json
 		bing_cookies = str(bing_cookies)
 else:
 	bing_cookies = ""
@@ -79,6 +79,10 @@ if not os.path.isfile('data/wiki.txt'):
 	with open('data/wiki.txt', 'w') as f:
 		# Add the text to the file
 		f.write("")	
+if not os.path.isfile('data/history.txt'):
+	with open('data/history.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")
 		
 		
 #Disable bing if cookies.json file isn't filled out
@@ -199,6 +203,10 @@ def reset():
 	with open('data/wiki.txt', 'w') as f:
 		# Add the text to the file
 		f.write("")
+	with open('data/history.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")
+	
 
 #Reset only text files related to history
 def clear():
@@ -209,6 +217,9 @@ def clear():
 		# Add the text to the file
 		f.write("")
 	with open('data/wiki.txt', 'w') as f:
+		# Add the text to the file
+		f.write("")
+	with open('data/history.txt', 'w') as f:
 		# Add the text to the file
 		f.write("")
 		
@@ -283,8 +294,18 @@ async def synthesize_text(text, voice):
 			print(f'Error: {str(e)}')
 	
 #EdgeGPT bing search using cookies.json
-async def bing(prompt):
+async def bing(prompt,history,save):
 	try:
+		if history:
+			with open('data/history.txt', 'r') as file:
+				activity = file.read()# Use previous history
+				print ("working")
+			prompt = activity + "\n" + "find information only from from data provided above: " + prompt
+		else:
+			with open('data/activity.txt', 'r') as file:
+				activity = file.read()# Use previous activity
+			prompt = activity + "\n" + prompt
+			
 		bot = Chatbot(cookiePath='cookies.json')
 		response = await bot.ask(prompt=prompt, conversation_style=ConversationStyle.precise)
 		
@@ -301,9 +322,14 @@ async def bing(prompt):
 		bing_response = bing_messages[-1]["text"]
 		bing_response = re.sub('\[\^\d+\^\]', '', bing_response)
 		print("\nBing:\n" + bing_response)
-		with open('data/activity.txt', 'w') as f:
-			# Add the text to the file
-			f.write(bing_response+'\n')
+		
+		if save:
+			with open('data/activity.txt', 'w') as f:
+				# Add the text to the file
+				f.write(bing_response+'\n')
+			with open('data/history.txt', 'a') as f:
+				# Add the text to the file
+				f.write(bing_response+'\n')
 		voice = "Salli"
 		asyncio.run(synthesize_text(bing_response,voice))
 		await bot.close()
@@ -375,9 +401,9 @@ def google(query):
 
 #Checking previous session info and reloading content if requested by user
 def previous_sesh():
-	print("\nWelcome to gpt-plus. This program supports auto switching between ChatGPT and Bing, executing multiple tasks, selection of pre-defined roles, generation of python (.py files), generation of html (.html files), web scraping and google/wikipedia searching. Complete setup and use the following options as required: \n\n\nUse 'tasks' to enter multitask mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'import python' while in python developer role to import python files from input folder.\nUse '--debug' at the end of a prompt or after 'import python' to execute code and debug (in python developer role).\nUse 'import html' to import html while in web developer role to import html files from the input folder.\nUse 'ask gpt' to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from Bing.\nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse '!clear' to clear current history and move to a new topic.\nUse '!reset' to clear history and reset program.\nUse '!shutdown' to exit program.\n")
+	print("\nWelcome to gpt-plus. This program supports auto switching between ChatGPT and Bing, executing multiple tasks, selection of pre-defined roles, generation of python (.py files), generation of html (.html files), web scraping and google/wikipedia searching. Complete setup and use the following options as required: \n\n\nUse 'tasks' to enter multitask mode.\nUse 'read clipboard' to access text from clipboard.\nUse 'import python' while in python developer role to import python files from input folder.\nUse '--debug' at the end of a prompt or after 'import python' to execute code and debug (in python developer role).\nUse 'import html' to import html while in web developer role to import html files from the input folder.\nUse 'ask gpt' to request response specifically from ChatGPT.\nUse 'ask bing' to request response specifically from Bing.\nUse 'search web' for searching the internet.\nUse 'search wiki' for searching Wikipedia.\nUse '!recall to access the full conversation history instead of only accessing previous conversation (default to reduce token usage).\nUse '!clear' to clear current history and move to a new topic.\nUse '!reset' to clear history and reset program.\nUse '!shutdown' to exit program.\n")
 	with open('data/gptver.txt', 'r') as file:
-		gptver = file.read()# Use the previous role
+		gptver = file.read()# Use the previous ver
 		#print("Role: " + activity + "\n")	
 	with open('data/role.txt', 'r') as file:
 		role = file.read()# Use the previous role
@@ -445,7 +471,7 @@ def test_py():
 	
 	if os.path.isfile('output/generated_code.py'):
 		with open('output/generated_code.py', 'r') as file:
-			python = file.read()# Use the previous role
+			python = file.read()# read generated code
 			#print("Role: " + activity + "\n")
 	else:
 		print ("\ngenerated_code.py file not found in output folder. Generate or import a python code prior to use of --debug function.")
@@ -496,14 +522,16 @@ def test_py():
 			with open('data/activity.txt', 'w') as file:
 				file.write(text)
 			with open('data/gptver.txt', 'r') as file:
-				model = file.read()# Use the previous role
+				model = file.read()# Use the previous ver
 				#print("Role: " + activity + "\n")	
 			with open('data/role.txt', 'r') as file:
 				role = file.read()# Use the previous role
 				#print("Role: " + activity + "\n")
 				print ("\nErrors found. Applying fixes.")
 			asyncio.run(synthesize_text("Errors found. Applying fixes.",voice))
-			gpt("",model,role)
+			history = False
+			save = True
+			gpt("",model,role,history,save)
 			print('\n\n')
 			print('')
 			while True:
@@ -762,13 +790,17 @@ def generate_image(prompt):
 		return
 	
 #chatgpt input and output	
-def gpt(prompt, model, role):
+def gpt(prompt, model, role, history, save):
 	try:
-		with open('data/activity.txt', 'r') as file:
-			activity = file.read()# Use the previous role
-			#print("Role: " + activity + "\n")
-		
-		prompt = activity + "\n" + prompt
+		if history:
+			with open('data/history.txt', 'r') as file:
+				activity = file.read()# Use previous history
+			prompt = activity + "\n" + "find information only from from data provided above: " + prompt
+		else:
+			with open('data/activity.txt', 'r') as file:
+				activity = file.read()# Use previous activity
+			prompt = activity + "\n" + prompt
+	
 		
 		response = openai.ChatCompletion.create(
 			max_tokens=2048,
@@ -792,9 +824,13 @@ def gpt(prompt, model, role):
 			print("Error: No content in response from OpenAI")
 			return
 		print('\nChatGPT:\n' + result)
-		with open('data/activity.txt', 'w') as f:
-			# Add the text to the file
-			f.write(result+'\n')
+		if save:
+			with open('data/activity.txt', 'w') as f:
+				# Add the text to the file
+				f.write(result+'\n')
+			with open('data/history.txt', 'a') as f:
+				# Add the text to the file
+				f.write(result+'\n')
 		if role == python_role:
 			save_py()
 		elif role == html_role:
@@ -810,6 +846,15 @@ def gpt(prompt, model, role):
 	
 #Check for functions and commands in text	
 def process_input(user_input, model, role):
+	history = False
+	save = True
+	if user_input.find('!recall') != -1:
+		user_input = user_input.replace("!recall", "")
+		history = True
+		voice = "Matthew"
+		asyncio.run(synthesize_text("Enabling recall mode.",voice))
+		print("\nEnabling recall mode.")
+		
 	#exit program
 	if user_input == "!shutdown":
 		voice = "Matthew"
@@ -842,10 +887,9 @@ def process_input(user_input, model, role):
 		#print (url[0])
 		scrape_web(url[0])
 		with open('data/web.txt', 'r') as file:
-			webtxt = file.read()# Use the previous role
+			webtxt = file.read()# read web data
 			#print("Role: " + activity + "\n")	
 		nourl = remove_url(user_input)
-		
 		if nourl is None:
 			user_input = webtxt
 		else:
@@ -854,15 +898,14 @@ def process_input(user_input, model, role):
 	#Switching to GPT mode. Will not auto switch to bing
 	if user_input.find('ask gpt') != -1:
 		string_without_askgpt = user_input.replace("ask gpt", "")
-		gpt(string_without_askgpt,model,role)
+		gpt(string_without_askgpt,model,role,history,save)
 		print('\n\n')
 		return
 	
 	if role == image_role:
-		gpt(user_input,model,role)
+		gpt(user_input,model,role,history,save)
 		with open('data/activity.txt', 'r') as file:
-			prompt = file.read()# Use the previous role
-			#print("Role: " + activity + "\n")	
+			prompt = file.read()# Use previous activity
 		generate_image(prompt)
 		return
 	
@@ -876,7 +919,7 @@ def process_input(user_input, model, role):
 		if role == python_role:
 			string_without_import = user_input.replace("import python", "")
 			input_py()
-			gpt(string_without_import,model,role)
+			gpt(string_without_import,model,role, history,save)
 			print('\n\n')
 			if debug:
 				test_py()
@@ -890,7 +933,7 @@ def process_input(user_input, model, role):
 	if user_input.find('--debug') !=-1:
 		if role == python_role:
 			string_without_errorchk = user_input.replace("--debug", "")
-			gpt(string_without_errorchk,model,role)
+			gpt(string_without_errorchk,model,role,history,save)
 			print('\n\n')
 			test_py()
 		else:
@@ -904,7 +947,7 @@ def process_input(user_input, model, role):
 		if role == html_role:
 			string_without_import = user_input.replace("import html", "")
 			input_html()
-			gpt(string_without_import,model,role)
+			gpt(string_without_import,model,role,history,save)
 			print('\n\n')
 		else:
 			print("\nPlease switch to Role 3: Web Developer to use this function.")
@@ -919,7 +962,7 @@ def process_input(user_input, model, role):
 			asyncio.run(synthesize_text("Switching to Bing.",voice))
 			print("\nSwitching to Bing.")
 			bing_input = user_input + ". Do not ask any questions after responding."
-			asyncio.run(bing(bing_input))
+			asyncio.run(bing(bing_input,history,save))
 			return 
 	
 	#switching to bing mode if 'ask bing' is present in text
@@ -929,7 +972,7 @@ def process_input(user_input, model, role):
 			voice = "Matthew"
 			asyncio.run(synthesize_text("Switching to Bing.",voice))
 			print("\nSwitching to Bing.")
-			asyncio.run(bing(string_without_askbing))
+			asyncio.run(bing(string_without_askbing,history,save))
 			return
 		else:
 			voice = "Matthew"
@@ -945,7 +988,7 @@ def process_input(user_input, model, role):
 		string_without_wiki = user_input.replace("search wiki", "")
 		wiki(str(string_without_wiki))
 		with open('data/wiki.txt', 'r') as file:
-			wikiout = file.read()# Use the previous role
+			wikiout = file.read()# read wiki text
 			#print("Role: " + activity + "\n")
 		user_input = "summarise" + wikiout
 		
@@ -959,7 +1002,7 @@ def process_input(user_input, model, role):
 		url = google(string_without_search)
 		scrape_web(url)
 		with open('data/web.txt', 'r') as file:
-			webtxt = file.read()# Use the previous role
+			webtxt = file.read()# read the web text
 			#print("Role: " + activity + "\n")	
 		user_input = "summarise" + webtxt
 	
@@ -978,7 +1021,7 @@ def process_input(user_input, model, role):
 			print("\nClipboard is empty. Please copy text to clipboard to use this function.")
 			return
 
-	gpt(user_input,model,role)
+	gpt(user_input,model,role,history,save)
 	print('\n\n')
 
 	
@@ -986,7 +1029,7 @@ def main():
 	#check for previous session, else request model and role input
 	if previous_sesh():
 		with open('data/gptver.txt', 'r') as file:
-			model = file.read()# Use the previous role
+			model = file.read()# Use the previous ver
 			#print("Role: " + activity + "\n")	
 		with open('data/role.txt', 'r') as file:
 			role = file.read()# Use the previous role
@@ -994,9 +1037,11 @@ def main():
 	else:		
 		model = get_gpt_ver()
 		role = get_user_role()	
-		
+	
+	history = False
+	save = False
 	#Initial GPT description		
-	gpt("Explain your role in 25 words",model,role)
+	gpt("Explain your role in 25 words",model,role,history,save)
 	
 	while True:
 		#Request user input

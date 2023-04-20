@@ -27,6 +27,7 @@ Use 'ask gpt' to request response specifically from ChatGPT.
 Use 'ask bing' to request response specifically from Bing.
 Use 'search web' for searching the internet.
 Use 'search wiki' for searching Wikipedia.
+Use '!recall to access the full conversation history instead of only accessing previous conversation (default to reduce token usage).
 Use '!clear' to clear current history and move to a new topic.
 Use '!reset' to clear history and reset program.
 Use '!shutdown' to exit program.
