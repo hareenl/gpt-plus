@@ -299,7 +299,6 @@ async def bing(prompt,history,save):
 		if history:
 			with open('data/history.txt', 'r') as file:
 				activity = file.read()# Use previous history
-				print ("working")
 			prompt = activity + "\n" + "find information only from from data provided above: " + prompt
 		else:
 			with open('data/activity.txt', 'r') as file:
