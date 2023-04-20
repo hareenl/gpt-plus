@@ -1,1 +1,1 @@
-python3 initialise.py
+python initialise.py
